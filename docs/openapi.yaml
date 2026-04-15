@@ -1,0 +1,35 @@
+openapi: 3.1.0
+info:
+  title: Task API
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000
+    description: Local development servers
+
+tags:
+  - name: Tasks
+    description: Task-related endpoints
+  - name: Monitoring
+    description: Operational endpoints, such as health checks
+paths:
+  /health:
+    get:
+      summary: Health Check
+      description: Returns the current status of the API. Used by Render to verify that the service is running.
+      tags:
+        - Monitoring
+      responses:
+        '200':
+          description: API is running successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+components:
+  schemas: {}
+  parameters: {}
+  
