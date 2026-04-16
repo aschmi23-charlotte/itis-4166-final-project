@@ -7,10 +7,10 @@ import { authorizeRoles } from '../middleware/authorizeRoles.js';
 const router = express.Router();
 
 router.get('/', authenticate, authorizeRoles("ADMIN"), getAllUsersHandler);
-router.get('/me', authenticate, getLoggedInUserHandler);
-router.put('/me', authenticate, validateUpdateUser, updateLoggedInUserHandler);
-router.delete('/me', authenticate, deleteLoggedInUserHandler);
+router.get('/:user_id', authenticate, getLoggedInUserHandler);
+router.put('/:user_id', authenticate, validateUpdateUser, updateLoggedInUserHandler);
+router.delete('/:user_id', authenticate, deleteLoggedInUserHandler);
 // router.get('/me/posts', authenticate, getPostsForLoggedInUserHandler);
-router.get('/me/:id/patch', authenticate, (req, res)=>{console.log('poop')});
+router.get('/:user_id/patch', authenticate, (req, res)=>{console.log('poop')});
 
 export default router;

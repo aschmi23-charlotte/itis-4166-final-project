@@ -1,6 +1,5 @@
 import { getAllUsers, getLoggedInUser, updateUser, deleteUser } from "../services/userService.js";
 // import { getAllForUser } from "../services/postService.js";
-
 export async function getAllUsersHandler(req, res) {
     const users = await getAllUsers();
     res.status(200).json(users);
