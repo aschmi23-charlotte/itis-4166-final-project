@@ -1,7 +1,10 @@
 import { login, signUp } from '../services/authService.js';
 
+
+
 export async function signUpHandler(req, res) {
     const { email, password, role } = req.body;
+    
     const newUser = await signUp(email, password, role);
     res.status(201).json(newUser);
 }
