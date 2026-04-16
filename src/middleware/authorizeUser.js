@@ -4,7 +4,7 @@
 // Valid strings are:
 // * role:{role} - the logged in user has this role. Example: 'role:ADMIN'
 // * user:{id} - the logged in user is a specific user. Example: 'user:6'
-// * user:me - the logged in user is matches the `user_id` parameter. Example: 'user:me'
+// * user:me - the logged in user is matches the `user_id` parameter (IE, the user is editing itself). Example: 'user:me'
 export function authorizeUserAccessRules(...ruleStrings) {    
     return function (req, res, next) {
         // Making the error handling a function here for convenience.
@@ -19,7 +19,6 @@ export function authorizeUserAccessRules(...ruleStrings) {
         ruleStrings.forEach(
             /**
              * @param {string} rule
-             * @param {number} index
              */
             (rule) => {
                 if (typeof rule === "string") {
@@ -66,12 +65,6 @@ export function authorizeUserAccessRules(...ruleStrings) {
 
 export async function authorizeOwnership(req, res, next) {
     const id = parseInt(req.user.id);
-    // const post = await getPostById(id);
 
-    // if (post.authorId !== req.user.id) {
-    //     const err = new Error("Forbidden: insufficient permission.");
-    //     err.status = 403;
-    //     return next(err);
-    // }
     next();
 }

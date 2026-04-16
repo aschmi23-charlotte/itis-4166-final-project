@@ -38,14 +38,3 @@ export async function deleteUserHandler(req, res) {
     res.status(204).send();
 }
 
-
-// export async function getPostsForLoggedInUserHandler(req, res) {
-//   const id = parseInt(req.user.id);
-//   // Will throw an error if the user doesn't exist.
-//   const user = await getLoggedInUser(id);
-//   console.log(user);
-//   const posts = await getAllForUser(id);
-//   console.log(posts);
-
-//   res.status(200).send(posts);
-// }
