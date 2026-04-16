@@ -2,7 +2,7 @@ import bcrypt from 'bcrypt';
 import userRepo from '../repositories/userRepo.js';
 
 export default {
-    async getAllUsers() {
+    async getAll() {
         return userRepo.findAll();
     },
 

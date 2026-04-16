@@ -8,7 +8,7 @@ export default {
 
     async getAll() {
         const lists = await prisma.toDoList.findMany();
-        return list;
+        return lists;
     },
 
     async getById(id) {
