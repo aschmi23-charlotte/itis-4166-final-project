@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "todolistitem" ADD COLUMN     "deadline" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP;
