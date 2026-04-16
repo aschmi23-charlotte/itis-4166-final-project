@@ -16,8 +16,10 @@ export async function getLoggedInUser(id) {
 }
 
 export async function updateUser(id, updatedData) {
-  let plain_pwd = updatedData.password;
-  updatedData.password = await bcrypt.hash(plain_pwd, await bcrypt.genSalt());
+  if (updatedData.password) {
+    let plain_pwd = updatedData.password;
+    updatedData.password = await bcrypt.hash(plain_pwd, await bcrypt.genSalt());
+  }
 
   const updatedPost = await update(id, updatedData);
   if (updatedPost) return updatedPost;

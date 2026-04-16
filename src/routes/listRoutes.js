@@ -4,7 +4,4 @@ import { validateGetTasksQueries, validateTask } from '../middleware/validateTas
 
 const router = express.Router();
 
-router.get('/', validateGetTasksQueries, taskController.getTasks);
-router.post('/', validateTask, taskController.createTask);
-
 export default router;

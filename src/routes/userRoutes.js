@@ -1,5 +1,5 @@
 import express from 'express';
-import { getAllUsersHandler, getLoggedInUserHandler, updateLoggedInUserHandler, deleteLoggedInPostHandler, getPostsForLoggedInUserHandler } from '../controllers/userController.js';
+import { getAllUsersHandler, getLoggedInUserHandler, updateLoggedInUserHandler, deleteLoggedInUserHandler } from '../controllers/userController.js';
 import { authenticate } from '../middleware/authenticate.js';
 import { validateUpdateUser } from '../middleware/userValidators.js'
 import { authorizeOwnership } from '../middleware/authorizeOwnership.js';
@@ -9,8 +9,8 @@ const router = express.Router();
 router.get('/', authenticate, authorizeRoles("ADMIN"), getAllUsersHandler);
 router.get('/me', authenticate, getLoggedInUserHandler);
 router.put('/me', authenticate, validateUpdateUser, updateLoggedInUserHandler);
-router.delete('/me', authenticate, deleteLoggedInPostHandler);
-router.get('/me/posts', authenticate, getPostsForLoggedInUserHandler);
+router.delete('/me', authenticate, deleteLoggedInUserHandler);
+// router.get('/me/posts', authenticate, getPostsForLoggedInUserHandler);
 router.get('/me/:id/patch', authenticate, (req, res)=>{console.log('poop')});
 
 export default router;

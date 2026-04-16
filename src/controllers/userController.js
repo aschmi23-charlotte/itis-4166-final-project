@@ -1,5 +1,5 @@
 import { getAllUsers, getLoggedInUser, updateUser, deleteUser } from "../services/userService.js";
-import { getAllForUser } from "../services/postService.js";
+// import { getAllForUser } from "../services/postService.js";
 
 export async function getAllUsersHandler(req, res) {
     const users = await getAllUsers();
@@ -19,19 +19,19 @@ export async function updateLoggedInUserHandler(req, res) {
   res.status(200).json(updatedUser);
 }
 
-export async function deleteLoggedInPostHandler(req, res) {
+export async function deleteLoggedInUserHandler(req, res) {
   const id = parseInt(req.user.id);
   await deleteUser(id);
   res.status(204).send();
 }
 
-export async function getPostsForLoggedInUserHandler(req, res) {
-  const id = parseInt(req.user.id);
-  // Will throw an error if the user doesn't exist.
-  const user = await getLoggedInUser(id);
-  console.log(user);
-  const posts = await getAllForUser(id);
-  console.log(posts);
+// export async function getPostsForLoggedInUserHandler(req, res) {
+//   const id = parseInt(req.user.id);
+//   // Will throw an error if the user doesn't exist.
+//   const user = await getLoggedInUser(id);
+//   console.log(user);
+//   const posts = await getAllForUser(id);
+//   console.log(posts);
   
-  res.status(200).send(posts);
-}
+//   res.status(200).send(posts);
+// }

@@ -8,6 +8,7 @@
     "start": "node src/server.js",
     "migrate:dev": "npx prisma migrate dev",
     "migrate:deploy": "npx prisma migrate deploy",
+    "generate:client": "npx prisma generate client",
     "seed:dev": "node --env-file=.env prisma/seed.js",
     "seed:prod": "node prisma/seed.js"
   },
@@ -17,7 +18,7 @@
     "prisma",
     "postgres",
     "api",
-    "todo"
+    "tasks"
   ],
   "author": "aschmi23-charlotte",
   "license": "ISC",
@@ -29,6 +30,7 @@
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
     "express": "^5.1.0",
+    "express-rate-limit": "^8.3.2",
     "express-validator": "^7.2.1",
     "js-yaml": "^4.1.1",
     "jsonwebtoken": "^9.0.3",
