@@ -2,16 +2,10 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { create, findByEmailInternal } from '../repositories/userRepo.js';
 
-const SIGNUP_AS_ADMIN = true;
+
 
 export async function signUp(email, password, role) {
 
-    if (!SIGNUP_AS_ADMIN && role === 'ADMIN') {
-        let err = new Error("Signing up with ADMIN role is currently disabled");
-        err.code = 400;
-        throw err;
-    }
-    
     const hashedPassword = await bcrypt.hash(password, await bcrypt.genSalt());
     const newUser = await create({ email, password: hashedPassword, role });
     return newUser;

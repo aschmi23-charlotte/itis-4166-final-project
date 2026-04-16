@@ -24,14 +24,25 @@ export async function updateUser(id, updatedData) {
         );
     }
 
-    const updatedPost = await update(id, updatedData);
-    if (updatedPost) return updatedPost;
+    const updatedUser = await update(id, updatedData);
+    if (updatedUser) return updatedUser;
     else {
         const error = new Error(`User ${id} not found`);
         error.status = 404;
         throw error;
     }
 }
+
+export async function patchUser(id, patchedData) {
+    const patchedUser = await update(id, patchedData);
+    if (patchedUser) return patchedUser;
+    else {
+        const error = new Error(`User ${id} not found`);
+        error.status = 404;
+        throw error;
+    }
+}
+
 
 export async function deleteUser(id) {
     const result = await remove(id);

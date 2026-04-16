@@ -52,6 +52,21 @@ export async function update(id, updatedData) {
     }
 }
 
+
+export async function patch(id, patchedData) {
+    try {
+        const patchedUser = await prisma.user.update({
+            where: { id },
+            data: patchedData,
+            omit: { password: true },
+        });
+        return patchedUser;
+    } catch (error) {
+        if (error.code === 'P2025') return null;
+        throw error;
+    }
+}
+
 export async function remove(id) {
     try {
         const deletedUser = await prisma.user.delete({

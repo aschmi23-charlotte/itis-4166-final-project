@@ -2,6 +2,7 @@ import {
     getAllUsers,
     getLoggedInUser,
     updateUser,
+    patchUser,
     deleteUser,
 } from '../services/userService.js';
 
@@ -24,11 +25,19 @@ export async function updateLoggedInUserHandler(req, res) {
     res.status(200).json(updatedUser);
 }
 
+export async function patchLoggedInUserHandler(req, res) {
+    const id = parseInt(req.param_user_id);
+    const { role } = req.body;
+    const patchedUser = await patchUser(id, { role });
+    res.status(200).json(patchedUser);
+}
+
 export async function deleteLoggedInUserHandler(req, res) {
     const id = parseInt(req.param_user_id);
     await deleteUser(id);
     res.status(204).send();
 }
+
 
 // export async function getPostsForLoggedInUserHandler(req, res) {
 //   const id = parseInt(req.user.id);

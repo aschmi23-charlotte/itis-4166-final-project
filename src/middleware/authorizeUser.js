@@ -11,7 +11,6 @@ export function authorizeUserAccessRules(...ruleStrings) {
         function throw_invalid_access_rule(str, explanation) {
             const err = new Error(`Internal Server Error: Invalid access rule ${str} - ${explanation}`);
             err.status = 500;
-            err.log_only = true;
             return next(err);
         }
 

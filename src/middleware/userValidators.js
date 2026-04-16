@@ -1,6 +1,31 @@
 import { param, body, oneOf, query } from 'express-validator';
 import { handleValidationErrors } from './handleValidationErrors.js';
 
+const SIGNUP_ROLES = ["ADMIN", "USER"];
+const ALL_ROLES = ["ADMIN", "USER"];
+
+function validateSignupRole(value) {
+    if (SIGNUP_ROLES.includes(value)) {
+        return true;
+    } else {
+        const err = new Error(
+            `Currently, new users are restricted to the following roles: ${SIGNUP_ROLES.join(", ")}`,
+        );
+        throw err;
+    }
+}
+
+function validateRole(value) {
+    if (ALL_ROLES.includes(value)) {
+        return true;
+    } else {
+        const err = new Error(
+            `Valid roles are: ${ALL_ROLES.join(", ")}`,
+        );
+        throw err;
+    }
+}
+
 export const validateSignup = [
     body('email')
         .exists({ values: 'falsy' })
@@ -37,16 +62,8 @@ export const validateSignup = [
         .isString()
         .withMessage('If present, role must be a string')
         .bail()
-        .custom((value) => {
-            if (['USER', 'ADMIN'].includes(value)) {
-                return true;
-            } else {
-                const err = new Error(
-                    'If present, role must be either USER or ADMIN',
-                );
-                throw err;
-            }
-        }),
+        .custom(validateRole)
+        .custom(validateSignupRole),
 
     handleValidationErrors,
 ];
@@ -109,6 +126,21 @@ export const validateUpdateUser = [
         .isString()
         .withMessage('Password must be a string')
         .bail(),
+
+    handleValidationErrors,
+];
+
+export const validatePatchUser = [
+    body('role')
+        .exists({ values: 'falsy' })
+        .withMessage('role is required')
+        .bail()
+        .trim()
+        .escape()
+        .isString()
+        .withMessage('Role must be a string')
+        .bail()
+        .custom(validateRole),
 
     handleValidationErrors,
 ];
