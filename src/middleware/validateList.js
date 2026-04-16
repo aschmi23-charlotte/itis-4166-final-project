@@ -10,7 +10,7 @@ export const validateGetTasksQueries = [
     handleValidationErrors,
 ];
 
-export const validateTask = [
+export const validateToDoList = [
     body('title')
         .trim()
         .escape()

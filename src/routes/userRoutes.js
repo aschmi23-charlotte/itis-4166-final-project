@@ -6,6 +6,7 @@ import {
     patchUserHandler,
     deleteUserHandler,
 } from '../controllers/userController.js';
+
 import { authenticate } from '../middleware/authenticate.js';
 import { validateUserIdParam, handleUserParamIsMe } from '../middleware/validateUserIdParam.js'
 import { validateUpdateUser } from '../middleware/userValidators.js';
