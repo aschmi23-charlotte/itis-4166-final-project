@@ -17,7 +17,7 @@
     "prisma",
     "postgres",
     "api",
-    "tasks"
+    "todo"
   ],
   "author": "aschmi23-charlotte",
   "license": "ISC",

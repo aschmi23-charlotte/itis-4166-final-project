@@ -13,16 +13,49 @@ datasource db {
   provider = "postgresql"
 }
 
+enum Role {
+  USER
+  ADMIN
+}
 
 model User {
   id Int @id @default(autoincrement())
   email String @unique
   password String
   role Role @default(USER)
+  createdAt DateTime @default(now()) @map("created_at")
+  lists ToDoList[]
   @@map("user")
 }
 
-enum Role {
-  USER
-  ADMIN
+model ToDoList {
+  id Int @id @default(autoincrement())
+  title String
+  isPublic Boolean @map("is_public")
+  createdAt DateTime @default(now()) @map("created_at")
+  items ToDoListItem[]
+  notes ToDoListNote[]
+  owner User @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId Int @map("user_id")
+  @@map("todolist")
+}
+
+model ToDoListItem {
+  id Int @id @default(autoincrement())
+  name String
+  details String?
+  createdAt DateTime @default(now()) @map("created_at")
+  list ToDoList @relation(fields: [listId], references: [id], onDelete: Cascade)
+  listId Int @map("list_id")
+  @@map("todolistitem")
+}
+
+model ToDoListNote {
+  id Int @id @default(autoincrement())
+  name String
+  content String
+  createdAt DateTime @default(now()) @map("created_at")
+  list ToDoList @relation(fields: [listId], references: [id], onDelete: Cascade)
+  listId Int @map("list_id")
+  @@map("todolistnote")
 }

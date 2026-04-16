@@ -4,7 +4,9 @@ import cors from 'cors';
 import swaggerUi from 'swagger-ui-express';
 import yaml from 'js-yaml';
 import fs from 'fs';
-import taskRoutes from './routes/taskRoutes.js';
+import listRoutes from './routes/listRoutes.js';
+import authRoutes from "./routes/authRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -22,23 +24,14 @@ try {
   process.exit(1);
 }
 
-if (NODE_ENV === "development") {
-  try {
-    let api_json = JSON.stringify(specs, null, 2);
-    fs.writeFileSync("./docs/_export_openapi.json", api_json, 'utf8');
-  } catch (error) {
-    console.log('Failed to export OpenAPI specification to JSON', error);
-    process.exit(1);
-  }
-}
-
-
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok' });
 });
 
-app.use('/tasks', taskRoutes);
+app.use('/list', listRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
 
 app.use((req, res, next) => {
   res.status(404).json({ error: 'Not found' });
