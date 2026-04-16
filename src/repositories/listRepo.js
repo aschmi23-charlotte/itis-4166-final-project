@@ -1,6 +1,6 @@
 import prisma from '../config/db.js';
 
-export default repo = {
+export default {
     async create(data) {
         const list = prisma.toDoList.create({ data: data });
         return list;

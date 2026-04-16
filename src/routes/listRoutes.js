@@ -2,7 +2,7 @@ import express from 'express';
 import listController from '../controllers/listController.js';
 import {
     validateGetTasksQueries,
-    validateTask,
+    validateToDoList,
 } from '../middleware/validateList.js';
 import { authenticate } from '../middleware/authenticate.js';
 import { validateUserIdParam, handleUserParamIsMe } from '../middleware/validateUserIdParam.js'

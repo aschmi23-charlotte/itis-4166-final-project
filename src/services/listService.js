@@ -1,6 +1,6 @@
 import listRepo from '../repositories/listRepo.js';
 
-export default service = {
+export default {
     async create(title, isPublic, ownerId) {
         return listRepo.create({
             title,

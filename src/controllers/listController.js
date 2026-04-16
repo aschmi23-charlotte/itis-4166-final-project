@@ -1,6 +1,6 @@
 import * as listService from '../services/listService.js';
 
-export default controller = {
+export default {
     async create(req, res) {
         const { title, content } = req.body;
         const newPost = await listService.create({ title, content, authorId: req.user.id });

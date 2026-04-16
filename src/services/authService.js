@@ -1,36 +1,36 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { create, findByEmailInternal } from '../repositories/userRepo.js';
+import userRepo from '../repositories/userRepo.js';
 
+export default {
+    async signUp(email, password, role) {
 
+        const hashedPassword = await bcrypt.hash(password, await bcrypt.genSalt());
+        const newUser = await userRepo.create({ email, password: hashedPassword, role });
+        return newUser;
+    },
 
-export async function signUp(email, password, role) {
+    async login(email, password) {
+        const err = new Error('Invalid Credentials');
+        err.status = 401;
 
-    const hashedPassword = await bcrypt.hash(password, await bcrypt.genSalt());
-    const newUser = await create({ email, password: hashedPassword, role });
-    return newUser;
-}
+        const user = await userRepo.findByEmailInternal(email);
+        if (!user) {
+            throw err;
+        }
 
-export async function login(email, password) {
-    const err = new Error('Invalid Credentials');
-    err.status = 401;
+        const match = await bcrypt.compare(password, user.password);
 
-    const user = await findByEmailInternal(email);
-    if (!user) {
-        throw err;
+        if (!match) {
+            throw err;
+        }
+
+        const accessToken = jwt.sign(
+            { id: user.id, role: user.role },
+            process.env.JWT_SECRET,
+            { expiresIn: process.env.JWT_EXPIRES_IN },
+        );
+
+        return accessToken;
     }
-
-    const match = await bcrypt.compare(password, user.password);
-
-    if (!match) {
-        throw err;
-    }
-
-    const accessToken = jwt.sign(
-        { id: user.id, role: user.role },
-        process.env.JWT_SECRET,
-        { expiresIn: process.env.JWT_EXPIRES_IN },
-    );
-
-    return accessToken;
-}
+};
