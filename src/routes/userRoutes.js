@@ -8,8 +8,7 @@ import {
 import { authenticate } from '../middleware/authenticate.js';
 import { validateUserIdParam, handleUserParamIsMe } from '../middleware/validateUserIdParam.js'
 import { validateUpdateUser } from '../middleware/userValidators.js';
-import { authorizeOwnership } from '../middleware/authorizeOwnership.js';
-import { authorizeRoles } from '../middleware/authorizeRoles.js';
+import { authorizeRoles, authorizeOwnership } from '../middleware/authorizeUser.js';
 const router = express.Router();
 
 router.get('/', authenticate, authorizeRoles('ADMIN'), getAllUsersHandler);
