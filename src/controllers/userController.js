@@ -1,4 +1,9 @@
-import { getAllUsers, getLoggedInUser, updateUser, deleteUser } from "../services/userService.js";
+import {
+    getAllUsers,
+    getLoggedInUser,
+    updateUser,
+    deleteUser,
+} from '../services/userService.js';
 // import { getAllForUser } from "../services/postService.js";
 export async function getAllUsersHandler(req, res) {
     const users = await getAllUsers();
@@ -12,16 +17,16 @@ export async function getLoggedInUserHandler(req, res) {
 }
 
 export async function updateLoggedInUserHandler(req, res) {
-  const id = parseInt(req.user.id);
-  const { email, password } = req.body;
-  const updatedUser = await updateUser(id, { email, password });
-  res.status(200).json(updatedUser);
+    const id = parseInt(req.user.id);
+    const { email, password } = req.body;
+    const updatedUser = await updateUser(id, { email, password });
+    res.status(200).json(updatedUser);
 }
 
 export async function deleteLoggedInUserHandler(req, res) {
-  const id = parseInt(req.user.id);
-  await deleteUser(id);
-  res.status(204).send();
+    const id = parseInt(req.user.id);
+    await deleteUser(id);
+    res.status(204).send();
 }
 
 // export async function getPostsForLoggedInUserHandler(req, res) {
@@ -31,6 +36,6 @@ export async function deleteLoggedInUserHandler(req, res) {
 //   console.log(user);
 //   const posts = await getAllForUser(id);
 //   console.log(posts);
-  
+
 //   res.status(200).send(posts);
 // }

@@ -26,9 +26,11 @@ export const validateSignup = [
         .withMessage('Password must be a string')
         .bail()
         .isLength({ min: 8, max: 64 })
-        .withMessage('Password must be at least 8 characters and at most 64 characters'),
-    
-    body("role")
+        .withMessage(
+            'Password must be at least 8 characters and at most 64 characters',
+        ),
+
+    body('role')
         .optional()
         .trim()
         .escape()
@@ -36,15 +38,17 @@ export const validateSignup = [
         .withMessage('If present, role must be a string')
         .bail()
         .custom((value) => {
-            if(["USER", "ADMIN"].includes(value)) {
+            if (['USER', 'ADMIN'].includes(value)) {
                 return true;
             } else {
-                const err = new Error("If present, role must be either USER or ADMIN");
+                const err = new Error(
+                    'If present, role must be either USER or ADMIN',
+                );
                 throw err;
             }
         }),
 
-  handleValidationErrors,
+    handleValidationErrors,
 ];
 
 export const validateLogin = [
@@ -72,10 +76,10 @@ export const validateLogin = [
         .withMessage('Password must be a string')
         .bail(),
 
-  handleValidationErrors,
+    handleValidationErrors,
 ];
 
-export const validateUpdateUser= [
+export const validateUpdateUser = [
     oneOf(
         [
             body('email').exists({ values: 'falsy' }),
@@ -106,5 +110,5 @@ export const validateUpdateUser= [
         .withMessage('Password must be a string')
         .bail(),
 
-  handleValidationErrors,
+    handleValidationErrors,
 ];

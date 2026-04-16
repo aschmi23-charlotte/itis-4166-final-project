@@ -1,4 +1,4 @@
-import { login, signUp } from "../services/authService.js";
+import { login, signUp } from '../services/authService.js';
 
 export async function signUpHandler(req, res) {
     const { email, password, role } = req.body;
@@ -7,7 +7,7 @@ export async function signUpHandler(req, res) {
 }
 
 export async function loginHandler(req, res) {
-    const {email, password} = req.body;
+    const { email, password } = req.body;
     const accessToken = await login(email, password);
-    res.status(200).json({accessToken});
+    res.status(200).json({ accessToken });
 }
