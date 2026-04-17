@@ -1,4 +1,5 @@
 import prisma from '../config/db.js';
+import userRepo from "./userRepo.js";
 
 export default {
     async create(data) {
@@ -9,6 +10,11 @@ export default {
     async getAll() {
         const lists = await prisma.toDoList.findMany();
         return lists;
+    },
+
+    async getAllForUser(ownerId) {
+        const list = await prisma.toDoList.findMany({ where: { ownerId } });
+        return list;
     },
 
     async getById(id) {
