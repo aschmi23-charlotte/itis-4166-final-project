@@ -1,5 +1,5 @@
 import prisma from '../config/db.js';
-import userRepo from "./userRepo.js";
+import userRepo from './userRepo.js';
 
 export default {
     async create(data) {
@@ -35,7 +35,7 @@ export default {
         }
     },
 
-    async remove(id){
+    async remove(id) {
         try {
             const list = await prisma.toDoList.delete({
                 where: { id },
@@ -45,5 +45,5 @@ export default {
             if (error.code === 'P2025') return null;
             throw error;
         }
-    }
+    },
 };

@@ -44,7 +44,6 @@ export default {
         }
     },
 
-
     async remove(id) {
         const result = await userRepo.remove(id);
         if (result) return;
@@ -53,5 +52,5 @@ export default {
             error.status = 404;
             throw error;
         }
-    }
+    },
 };

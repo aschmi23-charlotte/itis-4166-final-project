@@ -30,6 +30,5 @@ export default {
         const id = parseInt(req.param_user_id);
         await userService.remove(id);
         res.status(204).send();
-    }
-
+    },
 };

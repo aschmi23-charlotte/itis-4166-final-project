@@ -5,17 +5,13 @@ export default {
     validateUserId: [
         oneOf(
             [
-                param('user_id')
-                    .isInt()
-                    .bail()
-                ,
-                param('user_id')
-                    .isString()
-                    .equals("me")
-                    .bail()
-                ,
+                param('user_id').isInt().bail(),
+                param('user_id').isString().equals('me').bail(),
             ],
-            { message: "URL parameter 'user_id' must be an integer, or the string 'me'" },
+            {
+                message:
+                    "URL parameter 'user_id' must be an integer, or the string 'me'",
+            },
         ),
         handleValidationErrors,
     ],
@@ -29,9 +25,7 @@ export default {
         }
 
         next();
-    }
+    },
 };
 
-
 // Store the id for the user specified in the request object
-

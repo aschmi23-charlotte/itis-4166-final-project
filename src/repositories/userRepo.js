@@ -1,7 +1,6 @@
 import prisma from '../config/db.js';
 
 export default {
-
     async create(data) {
         try {
             const newUser = await prisma.user.create({
@@ -79,5 +78,5 @@ export default {
             if (error.code === 'P2025') return null;
             throw error;
         }
-    }
+    },
 };

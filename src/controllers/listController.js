@@ -3,7 +3,11 @@ import * as listService from '../services/listService.js';
 export default {
     async create(req, res) {
         const { title, content } = req.body;
-        const newPost = await listService.create({ title, content, authorId: req.user.id });
+        const newPost = await listService.create({
+            title,
+            content,
+            authorId: req.user.id,
+        });
         res.status(201).json(newPost);
     },
 
@@ -29,6 +33,5 @@ export default {
         const id = parseInt(req.params.id);
         await listService.remove(id);
         res.status(204).send();
-    }
-
+    },
 };

@@ -4,9 +4,15 @@ import userRepo from '../repositories/userRepo.js';
 
 export default {
     async signUp(email, password, role) {
-
-        const hashedPassword = await bcrypt.hash(password, await bcrypt.genSalt());
-        const newUser = await userRepo.create({ email, password: hashedPassword, role });
+        const hashedPassword = await bcrypt.hash(
+            password,
+            await bcrypt.genSalt(),
+        );
+        const newUser = await userRepo.create({
+            email,
+            password: hashedPassword,
+            role,
+        });
         return newUser;
     },
 
@@ -32,5 +38,5 @@ export default {
         );
 
         return accessToken;
-    }
+    },
 };

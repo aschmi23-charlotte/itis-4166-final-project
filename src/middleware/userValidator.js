@@ -2,8 +2,8 @@ import { body, oneOf } from 'express-validator';
 import rateLimit from 'express-rate-limit';
 import { handleValidationErrors } from './handleValidationErrors.js';
 
-const SIGNUP_ROLES = ["ADMIN", "USER"];
-const ALL_ROLES = ["ADMIN", "USER"];
+const SIGNUP_ROLES = ['ADMIN', 'USER'];
+const ALL_ROLES = ['ADMIN', 'USER'];
 
 // Custom validation steps
 function checkSignupRole(value) {
@@ -11,7 +11,7 @@ function checkSignupRole(value) {
         return true;
     } else {
         const err = new Error(
-            `Currently, new users are restricted to the following roles: ${SIGNUP_ROLES.join(", ")}`,
+            `Currently, new users are restricted to the following roles: ${SIGNUP_ROLES.join(', ')}`,
         );
         throw err;
     }
@@ -21,9 +21,7 @@ function checkRole(value) {
     if (ALL_ROLES.includes(value)) {
         return true;
     } else {
-        const err = new Error(
-            `Valid roles are: ${ALL_ROLES.join(", ")}`,
-        );
+        const err = new Error(`Valid roles are: ${ALL_ROLES.join(', ')}`);
         throw err;
     }
 }
@@ -115,7 +113,10 @@ export default {
                 body('email').exists({ values: 'falsy' }),
                 body('password').exists({ values: 'falsy' }),
             ],
-            { message: 'At least one field (email, password) must be provided' },
+            {
+                message:
+                    'At least one field (email, password) must be provided',
+            },
         ),
 
         body('email')
@@ -155,5 +156,5 @@ export default {
             .bail()
             .custom(checkRole),
         handleValidationErrors,
-    ]
+    ],
 };

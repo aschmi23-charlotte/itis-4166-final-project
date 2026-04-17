@@ -5,7 +5,7 @@ export default {
         return listRepo.create({
             title,
             isPublic,
-            ownerId
+            ownerId,
         });
     },
 
@@ -15,10 +15,9 @@ export default {
 
     async getById(id) {
         const list = listRepo.getById(id);
-        if (list) { 
+        if (list) {
             return list;
-        }
-        else {
+        } else {
             const error = new Error(`ToDoList ${id} not found`);
             error.status = 404;
             throw error;
@@ -27,25 +26,23 @@ export default {
 
     async update(id, updateData) {
         const list = listRepo.update(id, updateData);
-        if (list) { 
+        if (list) {
             return list;
-        }
-        else {
+        } else {
             const error = new Error(`ToDoList ${id} not found`);
             error.status = 404;
             throw error;
         }
     },
 
-    async remove(id){
+    async remove(id) {
         const result = listRepo.remove(id);
-        if (result) { 
+        if (result) {
             return;
-        }
-        else {
+        } else {
             const error = new Error(`ToDoList ${id} not found`);
             error.status = 404;
             throw error;
         }
-    }
-}
+    },
+};

@@ -4,11 +4,12 @@ const JWT_SECRET = process.env.JWT_SECRET;
 
 // Shorthand for access failure.
 function throw_invalid_access_rule(str, explanation) {
-    const err = new Error(`Internal Server Error: Invalid access rule ${str} - ${explanation}`);
+    const err = new Error(
+        `Internal Server Error: Invalid access rule ${str} - ${explanation}`,
+    );
     err.status = 500;
     return next(err);
 }
-
 
 // A more robust authorization mechanism using identifier strings.
 // Valid strings are:
@@ -16,14 +17,14 @@ function throw_invalid_access_rule(str, explanation) {
 // * user:{id} - the logged in user is a specific user. Example: 'user:6'
 // * user:me - the logged in user is matches the `user_id` parameter (IE, the user is editing itself). Example: 'user:me'
 function checkRuleString(req, res, rule) {
-    if (!rule.includes(":")) {
+    if (!rule.includes(':')) {
         throw_invalid_access_rule(rule, "the ':' seperator is missing");
     }
 
-    let str_args = rule.split(":");
+    let str_args = rule.split(':');
     let str_type = str_args[0];
     let str_val = str_args[1];
-    
+
     // Used on all routes
     switch (str_type) {
         case 'role':
@@ -32,33 +33,42 @@ function checkRuleString(req, res, rule) {
         case 'user':
             switch (str_val) {
                 // The logged in user is the user from user_id
-                case "me":
+                case 'me':
                     return req.user.id === req.param_user_id;
                 default:
                     // The logged in user is this specific user.
                     return req.user.id === parseInt(str_val);
             }
-        case "newlist":
+        case 'newlist':
             switch (str_val) {
                 // The logged in user is the user from user_id
-                case "owner_is_user":
+                case 'owner_is_user':
                     if (!req.body.ownerId) {
-                        throw_invalid_access_rule(rule, `req.body.ownerId is not defined on this route`);
+                        throw_invalid_access_rule(
+                            rule,
+                            `req.body.ownerId is not defined on this route`,
+                        );
                     }
                     return req.user.id === req.body.ownerId;
                     break;
                 default:
                     // The logged in user is this specific user.
-                    throw_invalid_access_rule(rule, `invalid rule string ${str_val} for type '${str_type}'`);
+                    throw_invalid_access_rule(
+                        rule,
+                        `invalid rule string ${str_val} for type '${str_type}'`,
+                    );
             }
             break;
         default:
-            throw_invalid_access_rule(rule, `invalid rule string type '${str_type}'`);
+            throw_invalid_access_rule(
+                rule,
+                `invalid rule string type '${str_type}'`,
+            );
     }
-    
+
     // else {
     //     throw_invalid_access_rule(rule, `invalid rule type '${typeof rule}'`);
-    // }      
+    // }
 }
 
 function checkRuleGroup(req, res, group) {
@@ -72,26 +82,28 @@ function checkRuleGroup(req, res, group) {
          */
         (rule) => {
             let check = false;
-            if (typeof rule === "string") {
-                check = checkRuleString(req, res, rule);  
-            } else if (typeof rule === "object") {
+            if (typeof rule === 'string') {
+                check = checkRuleString(req, res, rule);
+            } else if (typeof rule === 'object') {
                 check = checkRuleGroup(req, res, rule);
             }
 
             if (approved === undefined) {
                 approved = check;
-            } else if (mode === "AND") {
+            } else if (mode === 'AND') {
                 approved &&= check;
-            } else if (mode === "OR") {
+            } else if (mode === 'OR') {
                 approved &&= check;
             } else {
-                throw_invalid_access_rule(group, `group mode must be AND or OR`);
+                throw_invalid_access_rule(
+                    group,
+                    `group mode must be AND or OR`,
+                );
             }
-        }
+        },
     );
 
     return approved;
-
 }
 
 export default {
@@ -116,10 +128,13 @@ export default {
         }
     },
 
-    authorizeAccessRules(...ruleStrings) {    
+    authorizeAccessRules(...ruleStrings) {
         return function (req, res, next) {
             // Making the error handling a function here for convenience.
-            let approved = checkRuleGroup(req, res, {mode: "OR", rules: ruleStrings});
+            let approved = checkRuleGroup(req, res, {
+                mode: 'OR',
+                rules: ruleStrings,
+            });
 
             if (!approved) {
                 const err = new Error('Forbidden: insufficient permission');
@@ -129,4 +144,4 @@ export default {
             return next();
         };
     },
-}
+};

@@ -13,14 +13,18 @@ export default {
             .withMessage('The "title" field must be a string')
             .bail()
             .isLength({ min: 3, max: 64 })
-            .withMessage('The "title" field must be at least 8 characters and at most 64 characters'),
+            .withMessage(
+                'The "title" field must be at least 8 characters and at most 64 characters',
+            ),
 
         body('isPublic')
             .optional()
             .trim()
             .escape()
             .isBoolean()
-            .withMessage('If present, the "isPublic" must be a boolean (true or false)'),
+            .withMessage(
+                'If present, the "isPublic" must be a boolean (true or false)',
+            ),
 
         body('ownerId')
             .exists({ values: 'falsy' })
@@ -32,9 +36,10 @@ export default {
             .withMessage('The "ownerId" must be an integer')
             .bail()
             .isLength({ min: 3, max: 64 })
-            .withMessage('The "ownerId" must be at least 8 characters and at most 64 characters'),
-            
-        handleValidationErrors,
-    ]
+            .withMessage(
+                'The "ownerId" must be at least 8 characters and at most 64 characters',
+            ),
 
+        handleValidationErrors,
+    ],
 };
