@@ -7,10 +7,12 @@ import paramValidator from '../middleware/paramValidator.js';
 
 const router = express.Router();
 
+const rules = permissionHandler.accessRules;
+
 router.get(
     '/',
     permissionHandler.authenticate,
-    permissionHandler.authorizeAccessRules('role:ADMIN'),
+    permissionHandler.authorizeAccess(rules.loggedInUserIsRole("ADMIN")),
     userController.getAll,
 );
 router.get(
@@ -18,7 +20,7 @@ router.get(
     permissionHandler.authenticate,
     paramValidator.validateUserId,
     paramValidator.handleUserIdIsMe,
-    permissionHandler.authorizeAccessRules('role:ADMIN', 'user:me'),
+    permissionHandler.authorizeAccess(rules.OR(rules.loggedInUserIsRole("ADMIN"), rules.loggedInUserIsUserId())),
     userController.getById,
 );
 router.put(
@@ -26,7 +28,7 @@ router.put(
     permissionHandler.authenticate,
     paramValidator.validateUserId,
     paramValidator.handleUserIdIsMe,
-    permissionHandler.authorizeAccessRules('role:ADMIN', 'user:me'),
+    permissionHandler.authorizeAccess(rules.OR(rules.loggedInUserIsRole("ADMIN"), rules.loggedInUserIsUserId())),
     userValidator.validateUpdate,
     userController.update,
 );
@@ -35,7 +37,7 @@ router.patch(
     permissionHandler.authenticate,
     paramValidator.validateUserId,
     paramValidator.handleUserIdIsMe,
-    permissionHandler.authorizeAccessRules('role:ADMIN'),
+    permissionHandler.authorizeAccess(rules.loggedInUserIsRole("ADMIN")),
     userValidator.validatePatch,
     userController.patch,
 );
@@ -44,7 +46,7 @@ router.delete(
     permissionHandler.authenticate,
     paramValidator.validateUserId,
     paramValidator.handleUserIdIsMe,
-    permissionHandler.authorizeAccessRules('role:ADMIN', 'user:me'),
+    permissionHandler.authorizeAccess(rules.OR(rules.loggedInUserIsRole("ADMIN"), rules.loggedInUserIsUserId())),
     userController.remove,
 );
 

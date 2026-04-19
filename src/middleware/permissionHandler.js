@@ -11,101 +11,6 @@ function throw_invalid_access_rule(str, explanation) {
     return next(err);
 }
 
-// A more robust authorization mechanism using identifier strings.
-// Valid strings are:
-// * role:{role} - the logged in user has this role. Example: 'role:ADMIN'
-// * user:{id} - the logged in user is a specific user. Example: 'user:6'
-// * user:me - the logged in user is matches the `user_id` parameter (IE, the user is editing itself). Example: 'user:me'
-function checkRuleString(req, res, rule) {
-    if (!rule.includes(':')) {
-        throw_invalid_access_rule(rule, "the ':' seperator is missing");
-    }
-
-    let str_args = rule.split(':');
-    let str_type = str_args[0];
-    let str_val = str_args[1];
-
-    // Used on all routes
-    switch (str_type) {
-        case 'role':
-            // This is an approved role:
-            return req.user.role === str_val;
-        case 'user':
-            switch (str_val) {
-                // The logged in user is the user from user_id
-                case 'me':
-                    return req.user.id === req.param_user_id;
-                default:
-                    // The logged in user is this specific user.
-                    return req.user.id === parseInt(str_val);
-            }
-        case 'newlist':
-            switch (str_val) {
-                // The logged in user is the user from user_id
-                case 'owner_is_user':
-                    if (!req.body.ownerId) {
-                        throw_invalid_access_rule(
-                            rule,
-                            `req.body.ownerId is not defined on this route`,
-                        );
-                    }
-                    return req.user.id === req.body.ownerId;
-                    break;
-                default:
-                    // The logged in user is this specific user.
-                    throw_invalid_access_rule(
-                        rule,
-                        `invalid rule string ${str_val} for type '${str_type}'`,
-                    );
-            }
-            break;
-        default:
-            throw_invalid_access_rule(
-                rule,
-                `invalid rule string type '${str_type}'`,
-            );
-    }
-
-    // else {
-    //     throw_invalid_access_rule(rule, `invalid rule type '${typeof rule}'`);
-    // }
-}
-
-function checkRuleGroup(req, res, group) {
-    let approved = undefined;
-    /** type */
-    /** @type {string} */ let mode = group.mode;
-    /** @type {Array} */ let rules = group.rules;
-    rules.forEach(
-        /**
-         * @param {string} rule
-         */
-        (rule) => {
-            let check = false;
-            if (typeof rule === 'string') {
-                check = checkRuleString(req, res, rule);
-            } else if (typeof rule === 'object') {
-                check = checkRuleGroup(req, res, rule);
-            }
-
-            if (approved === undefined) {
-                approved = check;
-            } else if (mode === 'AND') {
-                approved &&= check;
-            } else if (mode === 'OR') {
-                approved &&= check;
-            } else {
-                throw_invalid_access_rule(
-                    group,
-                    `group mode must be AND or OR`,
-                );
-            }
-        },
-    );
-
-    return approved;
-}
-
 export default {
     authenticate(req, res, next) {
         const err = new Error('Not authenticated. Please provide valid token.');
@@ -128,13 +33,11 @@ export default {
         }
     },
 
-    authorizeAccessRules(...ruleStrings) {
+    // An access rule is a function that accepts the request object and returns boolean.
+    authorizeAccess(rule) {
         return function (req, res, next) {
             // Making the error handling a function here for convenience.
-            let approved = checkRuleGroup(req, res, {
-                mode: 'OR',
-                rules: ruleStrings,
-            });
+            let approved = rule(req);
 
             if (!approved) {
                 const err = new Error('Forbidden: insufficient permission');
@@ -143,5 +46,51 @@ export default {
             }
             return next();
         };
+    },
+    // Function factories for rules
+    accessRules: {
+        // Checking multiple rules:
+        AND(...rules) {
+            return function (req) {
+                let approved = true;
+
+                rules.forEach((rule) => {
+                    approved &&= rule(req);
+                });
+
+                return approved;
+            }
+        },
+
+        OR(...rules) {
+            return function (req) {
+                let approved = false;
+
+                rules.forEach((rule) => {
+                    approved ||= rule(req);
+                });
+
+                return approved;
+            }
+        },
+
+        loggedInUserIsRole(...roles) {
+            return function (req) {
+                return roles.includes(req.user.role);
+            }
+        },
+
+        loggedInUserIsUserId() {
+            return function (req) {
+                return req.user.id === req.param_user_id;
+            }
+        },
+
+        loggedInUserOwnsNewList() {
+            return function (req) {
+                return req.body.ownerId === undefined || req.user.id === req.body.ownerId;
+            }
+        }
+
     },
 };
