@@ -27,17 +27,15 @@ export default {
             ),
 
         body('ownerId')
-            .exists({ values: 'falsy' })
-            .withMessage('The "ownerId" is required')
-            .bail()
+            .optional()
             .trim()
             .escape()
             .isInt()
-            .withMessage('The "ownerId" must be an integer')
+            .withMessage('If present, the "ownerId" must be an integer')
             .bail()
             .isLength({ min: 3, max: 64 })
             .withMessage(
-                'The "ownerId" must be at least 8 characters and at most 64 characters',
+                'If present, The "ownerId" must be at least 8 characters and at most 64 characters',
             ),
 
         handleValidationErrors,

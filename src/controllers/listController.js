@@ -2,7 +2,13 @@ import listService from '../services/listService.js';
 
 export default {
     async create(req, res) {
-        const { title, content } = req.body;
+
+
+        const {
+            title = "",
+            isPublic = false,
+            ownerId = req.user.id // Defaults to logged in user.
+        } = req.body;
         const newPost = await listService.create({
             title,
             content,
