@@ -1,12 +1,8 @@
 import listRepo from '../repositories/listRepo.js';
 
 export default {
-    async create(title, isPublic, ownerId) {
-        return listRepo.create({
-            title,
-            isPublic,
-            ownerId,
-        });
+    async create(data) {
+        return listRepo.create(data);
     },
 
     async getAll() {
@@ -14,7 +10,7 @@ export default {
     },
 
     async getById(id) {
-        const list = listRepo.getById(id);
+        const list = await listRepo.getById(id);
         if (list) {
             return list;
         } else {
@@ -25,7 +21,8 @@ export default {
     },
 
     async update(id, updateData) {
-        const list = listRepo.update(id, updateData);
+        const list = await listRepo.update(id, updateData);
+        console.log(list);
         if (list) {
             return list;
         } else {
@@ -36,7 +33,7 @@ export default {
     },
 
     async remove(id) {
-        const result = listRepo.remove(id);
+        const result = await listRepo.remove(id);
         if (result) {
             return;
         } else {

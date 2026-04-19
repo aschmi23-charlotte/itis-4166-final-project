@@ -35,6 +35,25 @@ export default {
         }
     },
 
+    authenticateOptional(req, res, next) {
+        req.user = { id: null, role: null };
+
+        const authHeader = req.headers.authorization;
+        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+            return next();
+        }
+        
+        const token = authHeader.split(' ')[1];
+
+        try {
+            const payload = jwt.verify(token, JWT_SECRET);
+            req.user = { id: payload.id, role: payload.role };
+            return next();
+        } catch (error) {
+            return next(error);
+        }
+    },
+
     // An access rule is a function that accepts the request object and returns boolean.
     authorizeAccess(rule) {
         return function (req, res, next) {

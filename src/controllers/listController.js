@@ -28,12 +28,15 @@ export default {
 
     async update(req, res) {
         const id = parseInt(req.params.list_id);
-        const { title, isPublic } = req.body;
+        const { 
+            title = undefined,
+            isPublic = undefined
+         } = req.body;
         const updatedList = await listService.update(id, {
             title,
-            updatedList,
+            isPublic,
         });
-        res.status(200).json(updatedPost);
+        res.status(200).json(updatedList);
     },
 
     async delete(req, res) {

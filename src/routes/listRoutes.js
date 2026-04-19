@@ -20,11 +20,11 @@ router.post(
     listController.create,
 );
 
-router.get('/', permissionHandler.authenticate, listController.getAll);
-router.get(':list_id', permissionHandler.authenticate, listController.getById);
+router.get('/', permissionHandler.authenticateOptional, listController.getAll);
+router.get('/:list_id', permissionHandler.authenticateOptional, listController.getById);
 
 router.put(
-    ':list_id',
+    '/:list_id',
     permissionHandler.authenticate,
     paramValidator.validateListId,
     permissionHandler.authorizeAccess(
@@ -33,11 +33,19 @@ router.put(
             rules.loggedInUserOwnsList(),
         ),
     ),
+    toDoListValidator.validateUpdate,
     listController.update,
 );
 router.delete(
-    ':list_id',
+    '/:list_id',
     permissionHandler.authenticate,
+    paramValidator.validateListId,
+    permissionHandler.authorizeAccess(
+        rules.OR(
+            rules.loggedInUserIsRole('ADMIN'),
+            rules.loggedInUserOwnsList(),
+        ),
+    ),
     listController.delete,
 );
 

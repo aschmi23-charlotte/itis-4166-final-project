@@ -19,8 +19,6 @@ export default {
 
         body('isPublic')
             .optional()
-            .trim()
-            .escape()
             .isBoolean()
             .withMessage(
                 'If present, the "isPublic" must be a boolean (true or false)',
@@ -67,8 +65,6 @@ export default {
 
         body('isPublic')
             .optional()
-            .trim()
-            .escape()
             .isBoolean()
             .withMessage(
                 'If present, the "isPublic" must be a boolean (true or false)',
