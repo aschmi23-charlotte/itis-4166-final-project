@@ -61,7 +61,7 @@ export default {
                 });
 
                 return approved;
-            }
+            };
         },
 
         OR(...rules) {
@@ -73,26 +73,29 @@ export default {
                 });
 
                 return approved;
-            }
+            };
         },
 
         loggedInUserIsRole(...roles) {
             return function (req) {
                 return roles.includes(req.user.role);
-            }
+            };
         },
 
         loggedInUserIsUserId() {
             return function (req) {
                 return req.user.id === req.param_user_id;
-            }
+            };
         },
 
         loggedInUserOwnsNewList() {
             return function (req) {
                 /// ownerId will be defaulted to the logged in user is not present.
-                return req.body.ownerId === undefined || req.user.id === req.body.ownerId;
-            }
+                return (
+                    req.body.ownerId === undefined ||
+                    req.user.id === req.body.ownerId
+                );
+            };
         },
 
         loggedInUserOwnsList() {
@@ -100,8 +103,7 @@ export default {
                 let list_id = parseInt(req.params.list_id);
                 let list = listService.getById(list_id);
                 return list.ownerId === req.user.id;
-            }
-        }
-
+            };
+        },
     },
 };

@@ -13,9 +13,9 @@ router.post(
     toDoListValidator.validateCreate,
     permissionHandler.authorizeAccess(
         rules.OR(
-            rules.loggedInUserIsRole("ADMIN"),
+            rules.loggedInUserIsRole('ADMIN'),
             rules.loggedInUserOwnsNewList(),
-        )
+        ),
     ),
     listController.create,
 );
@@ -23,11 +23,18 @@ router.post(
 router.get('/', permissionHandler.authenticate, listController.getAll);
 router.get(':list_id', permissionHandler.authenticate, listController.getById);
 
-router.put(':list_id', permissionHandler.authenticate, paramValidator.validateListId, permissionHandler.authorizeAccess(
-    rules.OR(
-        rules.loggedInUserIsRole("ADMIN"),
-        rules.loggedInUserOwnsList(),
-)), listController.update);
+router.put(
+    ':list_id',
+    permissionHandler.authenticate,
+    paramValidator.validateListId,
+    permissionHandler.authorizeAccess(
+        rules.OR(
+            rules.loggedInUserIsRole('ADMIN'),
+            rules.loggedInUserOwnsList(),
+        ),
+    ),
+    listController.update,
+);
 router.delete(
     ':list_id',
     permissionHandler.authenticate,

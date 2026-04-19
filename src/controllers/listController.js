@@ -3,9 +3,9 @@ import listService from '../services/listService.js';
 export default {
     async create(req, res) {
         const {
-            title = "",
+            title = '',
             isPublic = false,
-            ownerId = req.user.id // Defaults to logged in user.
+            ownerId = req.user.id, // Defaults to logged in user.
         } = req.body;
         const newList = await listService.create({
             title,
@@ -29,7 +29,10 @@ export default {
     async update(req, res) {
         const id = parseInt(req.params.list_id);
         const { title, isPublic } = req.body;
-        const updatedList = await listService.update(id, { title, updatedList });
+        const updatedList = await listService.update(id, {
+            title,
+            updatedList,
+        });
         res.status(200).json(updatedPost);
     },
 

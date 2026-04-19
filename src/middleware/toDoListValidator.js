@@ -12,7 +12,7 @@ export default {
             .isString()
             .withMessage('The "title" field must be a string')
             .bail()
-            .isLength({ min: 3})
+            .isLength({ min: 3 })
             .withMessage(
                 'The "title" field must be at least 3 characters and at most 64 characters',
             ),
@@ -44,10 +44,13 @@ export default {
     validateUpdate: [
         oneOf(
             [
-            body('title').exists({ values: 'falsy' }),
-            body('isPublic').exists({ values: 'undefined' }),
+                body('title').exists({ values: 'falsy' }),
+                body('isPublic').exists({ values: 'undefined' }),
             ],
-            { message: 'At least one field (title, isPublic) must be provided' },
+            {
+                message:
+                    'At least one field (title, isPublic) must be provided',
+            },
         ),
 
         body('title')
@@ -57,7 +60,7 @@ export default {
             .isString()
             .withMessage('The "title" field must be a string')
             .bail()
-            .isLength({ min: 3})
+            .isLength({ min: 3 })
             .withMessage(
                 'The "title" field must be at least 3 characters and at most 64 characters',
             ),
@@ -72,5 +75,5 @@ export default {
             ),
 
         handleValidationErrors,
-    ]
+    ],
 };
