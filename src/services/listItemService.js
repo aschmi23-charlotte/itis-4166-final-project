@@ -1,43 +1,43 @@
-import listRepo from '../repositories/listRepo.js';
+import listItemRepo from '../repositories/listItemRepo.js';
 
 export default {
     async create(data) {
-        return listRepo.create(data);
+        return listItemRepo.create(data);
     },
 
-    async getAll() {
-        return listRepo.getAll();
+    async getAllForList(listId) {
+        return listItemRepo.getAllForList(listId);
     },
 
     async getById(id) {
-        const list = await listRepo.getById(id);
+        const list = await listItemRepo.getById(id);
         if (list) {
             return list;
         } else {
-            const error = new Error(`To-Do List ${id} not found`);
+            const error = new Error(`To-Do List Item ${id} not found`);
             error.status = 404;
             throw error;
         }
     },
 
     async update(id, updateData) {
-        const list = await listRepo.update(id, updateData);
+        const list = await listItemRepo.update(id, updateData);
         console.log(list);
         if (list) {
             return list;
         } else {
-            const error = new Error(`To-Do List ${id} not found`);
+            const error = new Error(`To-Do List Item ${id} not found`);
             error.status = 404;
             throw error;
         }
     },
 
     async remove(id) {
-        const result = await listRepo.remove(id);
+        const result = await listItemRepo.remove(id);
         if (result) {
             return;
         } else {
-            const error = new Error(`To-Do List ${id} not found`);
+            const error = new Error(`To-Do List Item ${id} not found`);
             error.status = 404;
             throw error;
         }
