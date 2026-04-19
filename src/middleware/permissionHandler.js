@@ -2,6 +2,8 @@
 import jwt from 'jsonwebtoken';
 const JWT_SECRET = process.env.JWT_SECRET;
 
+import listService from '../services/listService.js';
+
 // Shorthand for access failure.
 function throw_invalid_access_rule(str, explanation) {
     const err = new Error(
@@ -88,7 +90,16 @@ export default {
 
         loggedInUserOwnsNewList() {
             return function (req) {
+                /// ownerId will be defaulted to the logged in user is not present.
                 return req.body.ownerId === undefined || req.user.id === req.body.ownerId;
+            }
+        },
+
+        loggedInUserOwnsList() {
+            return function (req) {
+                let list_id = parseInt(req.params.list_id);
+                let list = listService.getById(list_id);
+                return list.ownerId === req.user.id;
             }
         }
 

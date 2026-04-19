@@ -1,4 +1,4 @@
-import { body, query } from 'express-validator';
+import { body, query, oneOf } from 'express-validator';
 import { handleValidationErrors } from './handleValidationErrors.js';
 
 export default {
@@ -12,9 +12,9 @@ export default {
             .isString()
             .withMessage('The "title" field must be a string')
             .bail()
-            .isLength({ min: 3, max: 64 })
+            .isLength({ min: 3})
             .withMessage(
-                'The "title" field must be at least 8 characters and at most 64 characters',
+                'The "title" field must be at least 3 characters and at most 64 characters',
             ),
 
         body('isPublic')
@@ -40,4 +40,37 @@ export default {
 
         handleValidationErrors,
     ],
+
+    validateUpdate: [
+        oneOf(
+            [
+            body('title').exists({ values: 'falsy' }),
+            body('isPublic').exists({ values: 'undefined' }),
+            ],
+            { message: 'At least one field (title, isPublic) must be provided' },
+        ),
+
+        body('title')
+            .optional()
+            .trim()
+            .escape()
+            .isString()
+            .withMessage('The "title" field must be a string')
+            .bail()
+            .isLength({ min: 3})
+            .withMessage(
+                'The "title" field must be at least 3 characters and at most 64 characters',
+            ),
+
+        body('isPublic')
+            .optional()
+            .trim()
+            .escape()
+            .isBoolean()
+            .withMessage(
+                'If present, the "isPublic" must be a boolean (true or false)',
+            ),
+
+        handleValidationErrors,
+    ]
 };

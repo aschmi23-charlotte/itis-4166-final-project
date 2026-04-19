@@ -26,6 +26,15 @@ export default {
 
         next();
     },
+
+    validateListId: [
+        param('list_id')
+            .isInt()
+            .withMessage("URL parameter 'list_id' must be an integer")
+            .bail(),
+
+        handleValidationErrors,
+    ],
 };
 
 // Store the id for the user specified in the request object
