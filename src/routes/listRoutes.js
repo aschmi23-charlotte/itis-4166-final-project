@@ -1,6 +1,6 @@
 import express from 'express';
 import paramValidator from '../middleware/paramValidator.js';
-import toDoListValidator from '../middleware/toDoListValidator.js';
+import listValidator from '../middleware/listValidator.js';
 import listController from '../controllers/listController.js';
 import permissionHandler from '../middleware/permissionHandler.js';
 
@@ -10,7 +10,7 @@ const router = express.Router();
 router.post(
     '/',
     permissionHandler.authenticate,
-    toDoListValidator.validateCreate,
+    listValidator.validateCreate,
     permissionHandler.authorizeAccess(
         rules.OR(
             rules.loggedInUserIsRole('ADMIN'),
@@ -21,7 +21,7 @@ router.post(
 );
 
 router.get('/', permissionHandler.authenticateOptional, listController.getAll);
-router.get('/:list_id', permissionHandler.authenticateOptional, listController.getById);
+router.get('/:list_id', permissionHandler.authenticateOptional, paramValidator.validateListId, listController.getById);
 
 router.put(
     '/:list_id',
@@ -33,7 +33,7 @@ router.put(
             rules.loggedInUserOwnsList(),
         ),
     ),
-    toDoListValidator.validateUpdate,
+    listValidator.validateUpdate,
     listController.update,
 );
 router.delete(

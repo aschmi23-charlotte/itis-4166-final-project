@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 const JWT_SECRET = process.env.JWT_SECRET;
 
 import listService from '../services/listService.js';
+import listItemService from '../services/listItemService.js';
 
 // Shorthand for access failure.
 function throw_invalid_access_rule(str, explanation) {
@@ -119,9 +120,28 @@ export default {
 
         loggedInUserOwnsList() {
             return function (req) {
-                let list_id = parseInt(req.params.list_id);
-                let list = listService.getById(list_id);
-                return list.ownerId === req.user.id;
+                if (req.params.list_id) {
+                    // List param specified in URL
+                    let list_id = parseInt(req.params.list_id);
+                    let list = listService.getById(list_id);
+                    return list.ownerId === req.user.id;
+
+                } else if (req.params.item_id) {
+                    // List ID param specified in URL
+                    item_id = parseInt(req.params.item_id);
+                    let item = listItemService.getById(item_id);
+                    let list = listService.getById(item.listId);
+                    return list.ownerId === req.user.id;
+                
+                } else if (req.body.listId) {
+                    // List id specified in the JSON body.
+                    let list = listService.getById(req.body.listId);
+                    return list.ownerId === req.user.id;
+                }
+                 
+                let err = new Error ("This URL is not allociated with any list");
+                err.status = 500;
+                throw err;
             };
         },
     },

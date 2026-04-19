@@ -3,44 +3,39 @@ import listItemService from '../services/listItemService.js';
 export default {
     async create(req, res) {
         const {
-            title = '',
-            isPublic = false,
-            ownerId = req.user.id, // Defaults to logged in user.
+            name = '',
+            details = null,
+            listId = null, 
         } = req.body;
-        const newList = await listService.create({
-            title,
-            isPublic,
-            ownerId,
+        const newItem = await listItemService.create({
+            name,
+            details,
+            listId,
         });
-        res.status(201).json(newList);
-    },
-
-    async getAll(req, res) {
-        let lists = await listService.getAll();
-        res.status(200).json(lists);
+        res.status(201).json(newItem);
     },
 
     async getById(req, res) {
-        const id = parseInt(req.params.list_id);
-        const list = await listService.getById(id);
+        const id = parseInt(req.params.item_id);
+        const list = await listItemService.getById(id);
         res.status(200).json(list);
     },
 
     async update(req, res) {
-        const id = parseInt(req.params.list_id);
+        const id = parseInt(req.params.item_id);
         const { 
             title = undefined,
             isPublic = undefined
          } = req.body;
-        const updatedList = await listService.update(id, {
+        const updatedItem = await listItemService.update(id, {
             title,
             isPublic,
         });
-        res.status(200).json(updatedList);
+        res.status(200).json(updatedItem);
     },
 
     async delete(req, res) {
-        const id = parseInt(req.params.list_id);
+        const id = parseInt(req.params.item_id);
         await listService.remove(id);
         res.status(204).send();
     },

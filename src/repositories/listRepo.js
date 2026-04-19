@@ -3,8 +3,21 @@ import userRepo from './userRepo.js';
 
 export default {
     async create(data) {
-        const list = prisma.toDoList.create({ data: data });
-        return list;
+        try {
+            const list = prisma.toDoList.create({ data: data });
+            return list;
+
+        } catch (error) {
+            if (error.code === 'P2003') {
+                const newError = new Error(
+                    `Cannot create list: user with id ${data.userid} does not exist`,
+                );
+                newError.status = 400;
+                throw newError;
+            } else {
+                throw error;
+            }
+        }
     },
 
     async getAll() {

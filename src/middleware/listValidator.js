@@ -30,11 +30,7 @@ export default {
             .escape()
             .isInt()
             .withMessage('If present, the "ownerId" must be an integer')
-            .bail()
-            .isLength({ min: 3, max: 64 })
-            .withMessage(
-                'If present, The "ownerId" must be at least 8 characters and at most 64 characters',
-            ),
+            .bail(),
 
         handleValidationErrors,
     ],
@@ -56,7 +52,7 @@ export default {
             .trim()
             .escape()
             .isString()
-            .withMessage('The "title" field must be a string')
+            .withMessage('If present, the "title" field must be a string')
             .bail()
             .isLength({ min: 3 })
             .withMessage(

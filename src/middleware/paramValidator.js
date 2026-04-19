@@ -35,6 +35,15 @@ export default {
 
         handleValidationErrors,
     ],
+
+    validateItemId: [
+        param('list_id')
+            .isInt()
+            .withMessage("URL parameter 'item_id' must be an integer")
+            .bail(),
+
+        handleValidationErrors,
+    ],
 };
 
 // Store the id for the user specified in the request object

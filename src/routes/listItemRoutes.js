@@ -2,7 +2,7 @@ import express from 'express';
 import listItemController from '../controllers/listItemController.js';
 
 import paramValidator from '../middleware/paramValidator.js';
-import toDoListValidator from '../middleware/toDoListValidator.js';
+import listItemValidator from '../middleware/listItemValidator.js';
 import permissionHandler from '../middleware/permissionHandler.js';
 
 const rules = permissionHandler.accessRules;
@@ -11,7 +11,7 @@ const router = express.Router();
 router.post(
     '/',
     permissionHandler.authenticate,
-    toDoListValidator.validateCreate,
+    listItemValidator.validateCreate,
     permissionHandler.authorizeAccess(
         rules.OR(
             rules.loggedInUserIsRole('ADMIN'),
@@ -21,26 +21,25 @@ router.post(
     listItemController.create,
 );
 
-router.get('/', permissionHandler.authenticateOptional, listItemController.getAll);
-router.get('/:list_id', permissionHandler.authenticateOptional, listItemController.getById);
+router.get('/:item_id', permissionHandler.authenticateOptional, paramValidator.validateItemId, listItemController.getById);
 
 router.put(
-    '/:list_id',
+    '/:item_id',
     permissionHandler.authenticate,
-    paramValidator.validateListId,
+    paramValidator.validateItemId,
     permissionHandler.authorizeAccess(
         rules.OR(
             rules.loggedInUserIsRole('ADMIN'),
             rules.loggedInUserOwnsList(),
         ),
     ),
-    toDoListValidator.validateUpdate,
+    listItemValidator.validateUpdate,
     listItemController.update,
 );
 router.delete(
-    '/:list_id',
+    '/:item_id',
     permissionHandler.authenticate,
-    paramValidator.validateListId,
+    paramValidator.validateItemId,
     permissionHandler.authorizeAccess(
         rules.OR(
             rules.loggedInUserIsRole('ADMIN'),
