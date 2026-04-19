@@ -4,17 +4,20 @@ import userRepo from './userRepo.js';
 export default {
     async create(data) {
         try {
-            const list = prisma.toDoListItem.create({ data: data });
+            const list = await prisma.toDoListItem.create({ data: data });
             return list;
 
         } catch (error) {
+
             if (error.code === 'P2003') {
                 const newError = new Error(
                     `Cannot create listitem: referenced list with id ${data.listId} does not exist`,
                 );
                 newError.status = 400;
+                console.log(newError);
                 throw newError;
             } else {
+                console.log("WTF");
                 throw error;
             }
         }

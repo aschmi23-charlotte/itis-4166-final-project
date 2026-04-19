@@ -4,7 +4,7 @@ import userRepo from './userRepo.js';
 export default {
     async create(data) {
         try {
-            const list = prisma.toDoList.create({ data: data });
+            const list = await prisma.toDoList.create({ data: data });
             return list;
 
         } catch (error) {

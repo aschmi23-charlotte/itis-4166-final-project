@@ -37,7 +37,7 @@ export default {
     ],
 
     validateItemId: [
-        param('list_id')
+        param('item_id')
             .isInt()
             .withMessage("URL parameter 'item_id' must be an integer")
             .bail(),

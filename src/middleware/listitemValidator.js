@@ -42,28 +42,28 @@ export default {
     validateUpdate: [
         oneOf(
             [
-                body('title').exists({ values: 'falsy' }),
+                body('name').exists({ values: 'falsy' }),
                 body('details').exists({ values: 'falsy' }),
             ],
             {
                 message:
-                    'At least one field (title, details) must be provided',
+                    'At least one field (name, details) must be provided',
             },
         ),
 
-        body('title')
+        body('name')
             .optional()
             .trim()
             .escape()
             .isString()
-            .withMessage('If present, the "title" field must be a string')
+            .withMessage('If present, the "name" field must be a string')
             .bail()
             .isLength({ min: 3 })
             .withMessage(
                 'The "name" field must be at least 3 characters.',
             ),
 
-        body('title')
+        body('details')
             .optional()
             .trim()
             .escape()

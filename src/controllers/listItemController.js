@@ -12,7 +12,6 @@ export default {
             details,
             listId,
         });
-        res.status(201).json(newItem);
     },
 
     async getById(req, res) {
@@ -24,19 +23,19 @@ export default {
     async update(req, res) {
         const id = parseInt(req.params.item_id);
         const { 
-            title = undefined,
-            isPublic = undefined
+            name = undefined,
+            details = undefined
          } = req.body;
         const updatedItem = await listItemService.update(id, {
-            title,
-            isPublic,
+            name,
+            details,
         });
         res.status(200).json(updatedItem);
     },
 
     async delete(req, res) {
         const id = parseInt(req.params.item_id);
-        await listService.remove(id);
+        await listItemService.remove(id);
         res.status(204).send();
     },
 };

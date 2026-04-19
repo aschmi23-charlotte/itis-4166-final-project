@@ -2,7 +2,9 @@ import listItemRepo from '../repositories/listItemRepo.js';
 
 export default {
     async create(data) {
-        return listItemRepo.create(data);
+        let retVal = listItemRepo.create(data);
+        console.log("why");
+        return retVal;
     },
 
     async getAllForList(listId) {
@@ -22,7 +24,6 @@ export default {
 
     async update(id, updateData) {
         const list = await listItemRepo.update(id, updateData);
-        console.log(list);
         if (list) {
             return list;
         } else {

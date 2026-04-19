@@ -15,7 +15,7 @@ router.post(
     permissionHandler.authorizeAccess(
         rules.OR(
             rules.loggedInUserIsRole('ADMIN'),
-            rules.loggedInUserOwnsNewList(),
+            rules.loggedInUserOwnsList(),
         ),
     ),
     listItemController.create,
