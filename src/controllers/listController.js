@@ -1,4 +1,4 @@
-import * as listService from '../services/listService.js';
+import listService from '../services/listService.js';
 
 export default {
     async create(req, res) {
