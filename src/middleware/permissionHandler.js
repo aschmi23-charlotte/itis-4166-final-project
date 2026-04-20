@@ -4,6 +4,7 @@ const JWT_SECRET = process.env.JWT_SECRET;
 
 import listService from '../services/listService.js';
 import listItemService from '../services/listItemService.js';
+import listNoteService from '../services/listNoteService.js';
 
 // Shorthand for access failure.
 function throw_invalid_access_rule(str, explanation) {
@@ -55,62 +56,65 @@ export default {
         }
     },
 
-    // An access rule is a function that accepts the request object and returns boolean.
+    // An access rule is a async function that accepts the request object and returns boolean.
     authorizeAccess(rule) {
-        return function (req, res, next) {
+        return async function (req, res, next) {
             // Making the error handling a function here for convenience.
-            let approved = rule(req);
-
-            if (!approved) {
-                const err = new Error('Forbidden: insufficient permission');
-                err.status = 403;
-                return next(err);
+            try {
+                let approved = await rule(req);
+                if (!approved) {
+                    const err = new Error('Forbidden: insufficient permission');
+                    err.status = 403;
+                    return next(err);
+                }
+                return next();
+            } catch (error) {
+                next(error);
             }
-            return next();
         };
     },
     // Function factories for rules
     accessRules: {
         // Checking multiple rules:
         AND(...rules) {
-            return function (req) {
+            return async function (req) {
                 let approved = true;
 
-                rules.forEach((rule) => {
-                    approved &&= rule(req);
-                });
+                for (let i = 0; i < rules.length; i++) {
+                    approved &&= await rules[i](req);
+                }
 
                 return approved;
             };
         },
 
         OR(...rules) {
-            return function (req) {
+            return async function (req) {
                 let approved = false;
 
-                rules.forEach((rule) => {
-                    approved ||= rule(req);
-                });
+                for (let i = 0; i < rules.length; i++) {
+                    approved ||= await rules[i](req);
+                }
 
                 return approved;
             };
         },
 
         loggedInUserIsRole(...roles) {
-            return function (req) {
+            return async function (req) {
                 return roles.includes(req.user.role);
             };
         },
 
         loggedInUserIsUserId() {
-            return function (req) {
+            return async function (req) {
                 return req.user.id === req.param_user_id;
             };
         },
 
         // Needs to be seperate since owner ID could possibly be undefined.
         loggedInUserOwnsNewList() {
-            return function (req) {
+            return async function (req) {
                 /// ownerId will be defaulted to the logged in user is not present.
                 return (
                     req.body.ownerId === undefined ||
@@ -120,23 +124,30 @@ export default {
         },
 
         loggedInUserOwnsList() {
-            return function (req) {
+            return async function (req) {
                 if (req.params.list_id) {
                     // List param specified in URL
                     let list_id = parseInt(req.params.list_id);
-                    let list = listService.getById(list_id);
+                    let list = await listService.getById(list_id);
                     return list.ownerId === req.user.id;
 
                 } else if (req.params.item_id) {
                     // List ID param specified in URL
-                    item_id = parseInt(req.params.item_id);
-                    let item = listItemService.getById(item_id);
-                    let list = listService.getById(item.listId);
+                    let item_id = parseInt(req.params.item_id);
+                    let item = await listItemService.getById(item_id);
+                    let list = await listService.getById(item.listId);
+                    return list.ownerId === req.user.id;
+                
+                } else if (req.params.note_id) {
+                    // List ID param specified in URL
+                    let note_id = parseInt(req.params.note_id);
+                    let note = await listNoteService.getById(note_id);
+                    let list = await listService.getById(note.listId);
                     return list.ownerId === req.user.id;
                 
                 } else if (req.body.listId) {
                     // List id specified in the JSON body.
-                    let list = listService.getById(req.body.listId);
+                    let list = await listService.getById(req.body.listId);
                     return list.ownerId === req.user.id;
                 }
                  
