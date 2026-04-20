@@ -22,17 +22,18 @@ router.post(
 );
 
 router.get('/', permissionHandler.authenticateOptional, listController.getAll);
-router.get('/:list_id', permissionHandler.authenticateOptional, paramValidator.validateListId, listController.getById);
-router.get('/:list_id/items', permissionHandler.authenticateOptional, paramValidator.validateListId, listItemController.getAllForList);
+router.get('/:list_id', permissionHandler.authenticateOptional, paramValidator.validateListId, paramValidator.loadAssociatedList, listController.getById);
+router.get('/:list_id/items', permissionHandler.authenticateOptional, paramValidator.validateListId, paramValidator.loadAssociatedList, listItemController.getAllForList);
 
 router.put(
     '/:list_id',
     permissionHandler.authenticate,
     paramValidator.validateListId,
+    paramValidator.loadAssociatedList,
     permissionHandler.authorizeAccess(
         rules.OR(
             rules.loggedInUserIsRole('ADMIN'),
-            rules.loggedInUserOwnsList(),
+            rules.loggedInUserOwnsAssociatedList(),
         ),
     ),
     listValidator.validateUpdate,
@@ -42,10 +43,11 @@ router.delete(
     '/:list_id',
     permissionHandler.authenticate,
     paramValidator.validateListId,
+    paramValidator.loadAssociatedList,
     permissionHandler.authorizeAccess(
         rules.OR(
             rules.loggedInUserIsRole('ADMIN'),
-            rules.loggedInUserOwnsList(),
+            rules.loggedInUserOwnsAssociatedList(),
         ),
     ),
     listController.delete,

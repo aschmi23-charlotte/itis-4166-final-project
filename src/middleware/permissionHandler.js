@@ -112,7 +112,6 @@ export default {
             };
         },
 
-        // Needs to be seperate since owner ID could possibly be undefined.
         loggedInUserOwnsNewList() {
             return async function (req) {
                 /// ownerId will be defaulted to the logged in user is not present.
@@ -123,35 +122,29 @@ export default {
             };
         },
 
-        loggedInUserOwnsList() {
+        loggedInUserOwnsAssociatedList() {
             return async function (req) {
-                if (req.params.list_id) {
-                    // List param specified in URL
-                    let list_id = parseInt(req.params.list_id);
-                    let list = await listService.getById(list_id);
-                    return list.ownerId === req.user.id;
+                if (req.associatedList) {
+                    return req.associatedList.ownerId === req.user.id;
+                }
 
-                } else if (req.params.item_id) {
-                    // List ID param specified in URL
-                    let item_id = parseInt(req.params.item_id);
-                    let item = await listItemService.getById(item_id);
-                    let list = await listService.getById(item.listId);
-                    return list.ownerId === req.user.id;
-                
-                } else if (req.params.note_id) {
-                    // List ID param specified in URL
-                    let note_id = parseInt(req.params.note_id);
-                    let note = await listNoteService.getById(note_id);
-                    let list = await listService.getById(note.listId);
-                    return list.ownerId === req.user.id;
-                
-                } else if (req.body.listId) {
+                // We only reach this point if we forgot to call a middleware that loads an associated list.
+                let err = new Error ("req.associatedList was not loaded");
+                err.status = 500;
+                throw err;
+            };
+        },
+
+        loggedInUserOwnsListFromReqBody() {
+            return async function (req) {
+                if (req.body.listId) {
                     // List id specified in the JSON body.
                     let list = await listService.getById(req.body.listId);
                     return list.ownerId === req.user.id;
                 }
-                 
-                let err = new Error ("This URL is not allociated with any list");
+                
+                // We should only reach this point if the request body wasn't validated.
+                let err = new Error ("req.body was not properly validated: req.body.listId is missing.");
                 err.status = 500;
                 throw err;
             };

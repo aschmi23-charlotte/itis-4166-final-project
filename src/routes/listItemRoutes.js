@@ -15,22 +15,23 @@ router.post(
     permissionHandler.authorizeAccess(
         rules.OR(
             rules.loggedInUserIsRole('ADMIN'),
-            rules.loggedInUserOwnsList(),
+            rules.loggedInUserOwnsListFromReqBody(),
         ),
     ),
     listItemController.create,
 );
 
-router.get('/:item_id', permissionHandler.authenticateOptional, paramValidator.validateItemId, listItemController.getById);
+router.get('/:item_id', permissionHandler.authenticateOptional, paramValidator.validateItemId, paramValidator.loadAssociatedListItem, listItemController.getById);
 
 router.put(
     '/:item_id',
     permissionHandler.authenticate,
     paramValidator.validateItemId,
+    paramValidator.loadAssociatedListItem,
     permissionHandler.authorizeAccess(
         rules.OR(
             rules.loggedInUserIsRole('ADMIN'),
-            rules.loggedInUserOwnsList(),
+            rules.loggedInUserOwnsAssociatedList(),
         ),
     ),
     listItemValidator.validateUpdate,
@@ -40,10 +41,11 @@ router.delete(
     '/:item_id',
     permissionHandler.authenticate,
     paramValidator.validateItemId,
+    paramValidator.loadAssociatedListItem,
     permissionHandler.authorizeAccess(
         rules.OR(
             rules.loggedInUserIsRole('ADMIN'),
-            rules.loggedInUserOwnsList(),
+            rules.loggedInUserOwnsAssociatedList(),
         ),
     ),
     listItemController.delete,

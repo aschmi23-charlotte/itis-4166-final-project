@@ -1,5 +1,8 @@
 import { param, oneOf } from 'express-validator';
 import { handleValidationErrors } from './handleValidationErrors.js';
+import listService from '../services/listService.js';
+import listItemService from '../services/listItemService.js';
+import listNoteService from '../services/listNoteService.js';
 
 export default {
     validateUserId: [
@@ -53,6 +56,55 @@ export default {
 
         handleValidationErrors,
     ],
+
+    async loadAssociatedList(req, res, next) {
+        if (req.params.list_id) {
+            // List param specified in URL
+            let list_id = parseInt(req.params.list_id);
+            let list = await listService.getById(list_id);
+            req.associatedList = list;
+            return next();
+        }
+
+        // Only runs if we call this on a URL without the list_id param.
+        let err = new Error ("This URL is not allociated with any list");
+        err.status = 500;
+        throw err;
+    },
+    
+    async loadAssociatedListItem (req, res, next) {
+        if (req.params.item_id) {
+            // List ID param specified in URL
+            let item_id = parseInt(req.params.item_id);
+            let item = await listItemService.getById(item_id);
+            let list = await listService.getById(item.listId);
+            req.associatedList = list;
+            req.associatedListItem = item;
+            return next();
+        } 
+        
+        // Only runs if we call this on a URL without the item_id param.
+        let err = new Error ("This URL is not allociated with any list or listitem");
+        err.status = 500;
+        throw err;
+    },
+
+    async loadAssociatedListNote (req, res, next) {
+        if (req.params.item_id) {
+            // List ID param specified in URL
+            let note_id = parseInt(req.params.note_id);
+            let note = await listNoteService.getById(note_id);
+            let list = await listService.getById(note.listId);
+            req.associatedList = list;
+            req.associatedListItem = note;
+            return next();
+        } 
+        
+        // Only runs if we call this on a URL without the item_id param.
+        let err = new Error ("This URL is not allociated with any list or listnote");
+        err.status = 500;
+        throw err;
+    }
 };
 
 // Store the id for the user specified in the request object

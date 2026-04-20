@@ -15,35 +15,38 @@ router.post(
     permissionHandler.authorizeAccess(
         rules.OR(
             rules.loggedInUserIsRole('ADMIN'),
-            rules.loggedInUserOwnsList(),
+            rules.loggedInUserOwnsListFromReqBody(),
         ),
     ),
     listNoteController.create,
 );
 
-router.get('/:note_id', permissionHandler.authenticateOptional, paramValidator.validateNoteId, listNoteController.getById);
+router.get('/:note_id', permissionHandler.authenticateOptional, paramValidator.validateNoteId, paramValidator.loadAssociatedListNote, listNoteController.getById);
 
 router.put(
     '/:note_id',
     permissionHandler.authenticate,
     paramValidator.validateNoteId,
+    paramValidator.loadAssociatedListNote,
     permissionHandler.authorizeAccess(
         rules.OR(
             rules.loggedInUserIsRole('ADMIN'),
-            rules.loggedInUserOwnsList(),
+            rules.loggedInUserOwnsAssociatedList(),
         ),
     ),
     listNoteValidator.validateUpdate,
     listNoteController.update,
 );
+
 router.delete(
     '/:note_id',
     permissionHandler.authenticate,
     paramValidator.validateNoteId,
+    paramValidator.loadAssociatedListNote,
     permissionHandler.authorizeAccess(
         rules.OR(
             rules.loggedInUserIsRole('ADMIN'),
-            rules.loggedInUserOwnsList(),
+            rules.loggedInUserOwnsAssociatedList(),
         ),
     ),
     listNoteController.delete,
