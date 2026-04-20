@@ -108,7 +108,14 @@ export default {
 
         loggedInUserIsUserId() {
             return async function (req) {
-                return req.user.id === req.param_user_id;
+                if (req.associatedUser) {
+                    return req.associatedUser.id === req.user.id;
+                }
+
+                // We only reach this point if we forgot to call a middleware that loads an associated list.
+                let err = new Error ("req.associatedUser was not loaded");
+                err.status = 500;
+                throw err;
             };
         },
 

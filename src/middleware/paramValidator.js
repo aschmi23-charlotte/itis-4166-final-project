@@ -1,5 +1,6 @@
 import { param, oneOf } from 'express-validator';
 import { handleValidationErrors } from './handleValidationErrors.js';
+import userService from '../services/userService.js';
 import listService from '../services/listService.js';
 import listItemService from '../services/listItemService.js';
 import listNoteService from '../services/listNoteService.js';
@@ -19,13 +20,18 @@ export default {
         handleValidationErrors,
     ],
 
-    async handleUserIdIsMe(req, res, next) {
+    async loadAssociatedUser(req, res, next) {
         let user_id_str = req.params.user_id;
+        let user_id = null;
+        
         if (user_id_str === 'me') {
-            req.param_user_id = req.user.id;
+            user_id = req.user.id;
         } else {
-            req.param_user_id = parseInt(user_id_str);
+            user_id = parseInt(user_id_str);
         }
+
+        let user = userService.getById(user_id);
+        req.associatedUser = user;
 
         next();
     },

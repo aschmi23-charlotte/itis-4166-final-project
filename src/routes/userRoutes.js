@@ -20,7 +20,7 @@ router.get(
     '/:user_id',
     permissionHandler.authenticate,
     paramValidator.validateUserId,
-    paramValidator.handleUserIdIsMe,
+    paramValidator.loadAssociatedUser,
     permissionHandler.authorizeAccess(
         rules.OR(
             rules.loggedInUserIsRole('ADMIN'),
@@ -34,7 +34,7 @@ router.get(
     '/:user_id/lists',
     permissionHandler.authenticate,
     paramValidator.validateUserId,
-    paramValidator.handleUserIdIsMe,
+    paramValidator.loadAssociatedUser,
     permissionHandler.authorizeAccess(
         rules.OR(
             rules.loggedInUserIsRole('ADMIN'),
@@ -48,7 +48,7 @@ router.put(
     '/:user_id',
     permissionHandler.authenticate,
     paramValidator.validateUserId,
-    paramValidator.handleUserIdIsMe,
+    paramValidator.loadAssociatedUser,
     permissionHandler.authorizeAccess(
         rules.OR(
             rules.loggedInUserIsRole('ADMIN'),
@@ -62,7 +62,7 @@ router.patch(
     '/:user_id',
     permissionHandler.authenticate,
     paramValidator.validateUserId,
-    paramValidator.handleUserIdIsMe,
+    paramValidator.loadAssociatedUser,
     permissionHandler.authorizeAccess(rules.loggedInUserIsRole('ADMIN')),
     userValidator.validatePatch,
     userController.patch,
@@ -71,7 +71,7 @@ router.delete(
     '/:user_id',
     permissionHandler.authenticate,
     paramValidator.validateUserId,
-    paramValidator.handleUserIdIsMe,
+    paramValidator.loadAssociatedUser,
     permissionHandler.authorizeAccess(
         rules.OR(
             rules.loggedInUserIsRole('ADMIN'),

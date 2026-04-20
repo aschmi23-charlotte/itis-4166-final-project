@@ -7,27 +7,27 @@ export default {
     },
 
     async getById(req, res) {
-        const id = parseInt(req.param_user_id);
+        const id = parseInt(req.associatedUser.id);
         const post = await userService.getById(id);
         res.status(200).json(post);
     },
 
     async update(req, res) {
-        const id = parseInt(req.param_user_id);
+        const id = parseInt(req.associatedUser.id);
         const { email, password } = req.body;
         const updatedUser = await userService.update(id, { email, password });
         res.status(200).json(updatedUser);
     },
 
     async patch(req, res) {
-        const id = parseInt(req.param_user_id);
+        const id = parseInt(req.associatedUser.id);
         const { role } = req.body;
         const patchedUser = await userService.patch(id, { role });
         res.status(200).json(patchedUser);
     },
 
     async remove(req, res) {
-        const id = parseInt(req.param_user_id);
+        const id = parseInt(req.associatedUser.id);
         await userService.remove(id);
         res.status(204).send();
     },
