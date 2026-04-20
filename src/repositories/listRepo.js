@@ -29,6 +29,11 @@ export default {
         return list;
     },
 
+    async getAllPublicForUser(ownerId) {
+        const list = await prisma.toDoList.findMany({ where: { ownerId, isPublic: true } });
+        return list;
+    },
+
     async getById(id) {
         const list = await prisma.toDoList.findUnique({ where: { id } });
         return list;

@@ -97,7 +97,7 @@ export default {
     },
 
     async loadAssociatedListNote(req, res, next) {
-        if (req.params.item_id) {
+        if (req.params.note_id) {
             // List ID param specified in URL
             let note_id = parseInt(req.params.note_id);
             let note = await listNoteService.getById(note_id);

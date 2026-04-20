@@ -13,6 +13,10 @@ export default {
         return listRepo.getAllForUser(ownerId);
     },
 
+    async getAllPublicForUser(ownerId) {
+        return listRepo.getAllPublicForUser(ownerId);
+    },
+
     async getById(id) {
         const list = await listRepo.getById(id);
         if (list) {

@@ -44,6 +44,14 @@ router.get(
     listController.getAllForUser
 );
 
+router.get(
+    '/:user_id/lists_public',
+    permissionHandler.authenticateOptional,
+    paramValidator.validateUserId,
+    paramValidator.loadAssociatedUser,
+    listController.getAllPublicForUser
+);
+
 router.put(
     '/:user_id',
     permissionHandler.authenticate,
