@@ -5,3 +5,4 @@
 * POST /api/list/: Body arguments isPublic and ownerId are both optional.
 * POST /api/listitem instead of /api/listitems
 * POST /api/listitem is used to create new To-Do list items instead of POST /api/list/:list_id/items
+* Using /api/list/public instead of /api/list_public

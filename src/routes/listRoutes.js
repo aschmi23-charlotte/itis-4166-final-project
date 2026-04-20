@@ -24,11 +24,17 @@ router.post(
 
 router.get(
     '/',
-    permissionHandler.authenticateOptional,
+    permissionHandler.authenticate,
     permissionHandler.authorizeAccess(
         rules.loggedInUserIsRole("ADMIN")
     ),
     listController.getAll
+);
+
+router.get(
+    '/public',
+    permissionHandler.authenticate,
+    listController.getAllPublic
 );
 
 router.get(

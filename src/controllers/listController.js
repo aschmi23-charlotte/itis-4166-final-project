@@ -20,6 +20,11 @@ export default {
         res.status(200).json(lists);
     },
 
+    async getAllPublic(req, res) {
+        let lists = await listService.getAllPublic();
+        res.status(200).json(lists);
+    },
+
     async getAllForUser(req, res) {
         let lists = await listService.getAllForUser(req.associatedUser.id);
         res.status(200).json(lists);

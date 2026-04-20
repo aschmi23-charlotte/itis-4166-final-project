@@ -9,6 +9,10 @@ export default {
         return listRepo.getAll();
     },
 
+    async getAllPublic() {
+        return listRepo.getAllPublic();
+    },
+
     async getAllForUser(ownerId) {
         return listRepo.getAllForUser(ownerId);
     },
