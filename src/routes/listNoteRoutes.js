@@ -21,7 +21,13 @@ router.post(
     listNoteController.create,
 );
 
-router.get('/:note_id', permissionHandler.authenticateOptional, paramValidator.validateNoteId, paramValidator.loadAssociatedListNote, listNoteController.getById);
+router.get(
+    '/:note_id',
+    permissionHandler.authenticateOptional,
+    paramValidator.validateNoteId,
+    paramValidator.loadAssociatedListNote,
+    listNoteController.getById,
+);
 
 router.put(
     '/:note_id',

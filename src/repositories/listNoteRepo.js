@@ -6,9 +6,7 @@ export default {
         try {
             const list = await prisma.toDoListNote.create({ data: data });
             return list;
-
         } catch (error) {
-
             if (error.code === 'P2003') {
                 const newError = new Error(
                     `Cannot create To-Do List Note: referenced list with id ${data.listId} does not exist`,
@@ -17,7 +15,7 @@ export default {
                 console.log(newError);
                 throw newError;
             } else {
-                console.log("WTF");
+                console.log('WTF');
                 throw error;
             }
         }

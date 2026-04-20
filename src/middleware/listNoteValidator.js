@@ -13,10 +13,8 @@ export default {
             .withMessage('The "name" field must be a string')
             .bail()
             .isLength({ min: 3 })
-            .withMessage(
-                'The "name" field must be at least 3 characters.',
-            ),
-        
+            .withMessage('The "name" field must be at least 3 characters.'),
+
         body('content')
             .optional()
             .trim()
@@ -25,9 +23,7 @@ export default {
             .withMessage('If present, the "content" field must be a string')
             .bail()
             .isLength({ min: 3 })
-            .withMessage(
-                'The "content" field must be at least 3 characters.',
-            ),
+            .withMessage('The "content" field must be at least 3 characters.'),
 
         body('listId')
             .exists({ values: 'falsy' })
@@ -46,8 +42,7 @@ export default {
                 body('content').exists({ values: 'falsy' }),
             ],
             {
-                message:
-                    'At least one field (title, content) must be provided',
+                message: 'At least one field (title, content) must be provided',
             },
         ),
 
@@ -59,9 +54,7 @@ export default {
             .withMessage('If present, the "name" field must be a string')
             .bail()
             .isLength({ min: 3 })
-            .withMessage(
-                'The "name" field must be at least 3 characters.',
-            ),
+            .withMessage('The "name" field must be at least 3 characters.'),
 
         body('content')
             .optional()
@@ -71,9 +64,7 @@ export default {
             .withMessage('If present, the "content" field must be a string')
             .bail()
             .isLength({ min: 3 })
-            .withMessage(
-                'The "content" field must be at least 3 characters.',
-            ),
+            .withMessage('The "content" field must be at least 3 characters.'),
 
         handleValidationErrors,
     ],

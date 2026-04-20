@@ -13,10 +13,8 @@ export default {
             .withMessage('The "name" field must be a string')
             .bail()
             .isLength({ min: 3 })
-            .withMessage(
-                'The "name" field must be at least 3 characters.',
-            ),
-        
+            .withMessage('The "name" field must be at least 3 characters.'),
+
         body('details')
             .optional()
             .trim()
@@ -25,9 +23,7 @@ export default {
             .withMessage('If present, the "details" field must be a string')
             .bail()
             .isLength({ min: 3 })
-            .withMessage(
-                'The "details" field must be at least 3 characters.',
-            ),
+            .withMessage('The "details" field must be at least 3 characters.'),
 
         body('listId')
             .exists({ values: 'falsy' })
@@ -46,8 +42,7 @@ export default {
                 body('details').exists({ values: 'falsy' }),
             ],
             {
-                message:
-                    'At least one field (name, details) must be provided',
+                message: 'At least one field (name, details) must be provided',
             },
         ),
 
@@ -59,9 +54,7 @@ export default {
             .withMessage('If present, the "name" field must be a string')
             .bail()
             .isLength({ min: 3 })
-            .withMessage(
-                'The "name" field must be at least 3 characters.',
-            ),
+            .withMessage('The "name" field must be at least 3 characters.'),
 
         body('details')
             .optional()
@@ -71,9 +64,7 @@ export default {
             .withMessage('If present, the "details" field must be a string')
             .bail()
             .isLength({ min: 3 })
-            .withMessage(
-                'The "details" field must be at least 3 characters.',
-            ),
+            .withMessage('The "details" field must be at least 3 characters.'),
 
         handleValidationErrors,
     ],

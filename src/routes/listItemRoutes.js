@@ -21,7 +21,13 @@ router.post(
     listItemController.create,
 );
 
-router.get('/:item_id', permissionHandler.authenticateOptional, paramValidator.validateItemId, paramValidator.loadAssociatedListItem, listItemController.getById);
+router.get(
+    '/:item_id',
+    permissionHandler.authenticateOptional,
+    paramValidator.validateItemId,
+    paramValidator.loadAssociatedListItem,
+    listItemController.getById,
+);
 
 router.put(
     '/:item_id',

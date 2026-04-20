@@ -46,7 +46,7 @@ export default {
             .bail(),
 
         handleValidationErrors,
-    ],    
+    ],
 
     validateNoteId: [
         param('note_id')
@@ -67,12 +67,12 @@ export default {
         }
 
         // Only runs if we call this on a URL without the list_id param.
-        let err = new Error ("This URL is not allociated with any list");
+        let err = new Error('This URL is not allociated with any list');
         err.status = 500;
         throw err;
     },
-    
-    async loadAssociatedListItem (req, res, next) {
+
+    async loadAssociatedListItem(req, res, next) {
         if (req.params.item_id) {
             // List ID param specified in URL
             let item_id = parseInt(req.params.item_id);
@@ -81,15 +81,17 @@ export default {
             req.associatedList = list;
             req.associatedListItem = item;
             return next();
-        } 
-        
+        }
+
         // Only runs if we call this on a URL without the item_id param.
-        let err = new Error ("This URL is not allociated with any list or listitem");
+        let err = new Error(
+            'This URL is not allociated with any list or listitem',
+        );
         err.status = 500;
         throw err;
     },
 
-    async loadAssociatedListNote (req, res, next) {
+    async loadAssociatedListNote(req, res, next) {
         if (req.params.item_id) {
             // List ID param specified in URL
             let note_id = parseInt(req.params.note_id);
@@ -98,13 +100,15 @@ export default {
             req.associatedList = list;
             req.associatedListItem = note;
             return next();
-        } 
-        
+        }
+
         // Only runs if we call this on a URL without the item_id param.
-        let err = new Error ("This URL is not allociated with any list or listnote");
+        let err = new Error(
+            'This URL is not allociated with any list or listnote',
+        );
         err.status = 500;
         throw err;
-    }
+    },
 };
 
 // Store the id for the user specified in the request object

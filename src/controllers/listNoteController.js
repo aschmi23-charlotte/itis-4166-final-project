@@ -2,17 +2,13 @@ import listNoteService from '../services/listNoteService.js';
 
 export default {
     async create(req, res) {
-        const {
-            name = "",
-            content = "",
-            listId = null, 
-        } = req.body;
+        const { name = '', content = '', listId = null } = req.body;
         const newNote = await listNoteService.create({
             name,
             content,
             listId,
         });
-         res.status(201).json(newNote);
+        res.status(201).json(newNote);
     },
 
     async getAllForList(req, res) {
@@ -29,10 +25,7 @@ export default {
 
     async update(req, res) {
         const id = parseInt(req.params.note_id);
-        const { 
-            name = undefined,
-            content = undefined
-         } = req.body;
+        const { name = undefined, content = undefined } = req.body;
         const updatedNote = await listNoteService.update(id, {
             name,
             content,

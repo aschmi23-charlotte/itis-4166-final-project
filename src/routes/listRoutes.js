@@ -22,8 +22,20 @@ router.post(
 );
 
 router.get('/', permissionHandler.authenticateOptional, listController.getAll);
-router.get('/:list_id', permissionHandler.authenticateOptional, paramValidator.validateListId, paramValidator.loadAssociatedList, listController.getById);
-router.get('/:list_id/items', permissionHandler.authenticateOptional, paramValidator.validateListId, paramValidator.loadAssociatedList, listItemController.getAllForList);
+router.get(
+    '/:list_id',
+    permissionHandler.authenticateOptional,
+    paramValidator.validateListId,
+    paramValidator.loadAssociatedList,
+    listController.getById,
+);
+router.get(
+    '/:list_id/items',
+    permissionHandler.authenticateOptional,
+    paramValidator.validateListId,
+    paramValidator.loadAssociatedList,
+    listItemController.getAllForList,
+);
 
 router.put(
     '/:list_id',

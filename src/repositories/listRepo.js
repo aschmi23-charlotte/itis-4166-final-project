@@ -6,7 +6,6 @@ export default {
         try {
             const list = await prisma.toDoList.create({ data: data });
             return list;
-
         } catch (error) {
             if (error.code === 'P2003') {
                 const newError = new Error(

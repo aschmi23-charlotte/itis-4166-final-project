@@ -2,11 +2,7 @@ import listItemService from '../services/listItemService.js';
 
 export default {
     async create(req, res) {
-        const {
-            name = '',
-            details = null,
-            listId = null, 
-        } = req.body;
+        const { name = '', details = null, listId = null } = req.body;
         const newItem = await listItemService.create({
             name,
             details,
@@ -29,10 +25,7 @@ export default {
 
     async update(req, res) {
         const id = parseInt(req.params.item_id);
-        const { 
-            name = undefined,
-            details = undefined
-         } = req.body;
+        const { name = undefined, details = undefined } = req.body;
         const updatedItem = await listItemService.update(id, {
             name,
             details,

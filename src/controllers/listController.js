@@ -28,10 +28,7 @@ export default {
 
     async update(req, res) {
         const id = parseInt(req.params.list_id);
-        const { 
-            title = undefined,
-            isPublic = undefined
-         } = req.body;
+        const { title = undefined, isPublic = undefined } = req.body;
         const updatedList = await listService.update(id, {
             title,
             isPublic,
