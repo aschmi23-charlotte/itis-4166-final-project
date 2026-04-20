@@ -24,7 +24,7 @@ router.get(
     permissionHandler.authorizeAccess(
         rules.OR(
             rules.loggedInUserIsRole('ADMIN'),
-            rules.loggedInUserIsUserId(),
+            rules.associatedUserIsLoggedIn(),
         ),
     ),
     userController.getById,
@@ -38,7 +38,7 @@ router.get(
     permissionHandler.authorizeAccess(
         rules.OR(
             rules.loggedInUserIsRole('ADMIN'),
-            rules.loggedInUserIsUserId(),
+            rules.associatedUserIsLoggedIn(),
         ),
     ),
     listController.get
@@ -52,7 +52,7 @@ router.put(
     permissionHandler.authorizeAccess(
         rules.OR(
             rules.loggedInUserIsRole('ADMIN'),
-            rules.loggedInUserIsUserId(),
+            rules.associatedUserIsLoggedIn(),
         ),
     ),
     userValidator.validateUpdate,
@@ -75,7 +75,7 @@ router.delete(
     permissionHandler.authorizeAccess(
         rules.OR(
             rules.loggedInUserIsRole('ADMIN'),
-            rules.loggedInUserIsUserId(),
+            rules.associatedUserIsLoggedIn(),
         ),
     ),
     userController.remove,

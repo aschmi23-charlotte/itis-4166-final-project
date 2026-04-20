@@ -106,7 +106,7 @@ export default {
             };
         },
 
-        loggedInUserIsUserId() {
+        associatedUserIsLoggedIn() {
             return async function (req) {
                 if (req.associatedUser) {
                     return req.associatedUser.id === req.user.id;
