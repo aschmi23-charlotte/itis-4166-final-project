@@ -3,6 +3,7 @@ import paramValidator from '../middleware/paramValidator.js';
 import listValidator from '../middleware/listValidator.js';
 import listController from '../controllers/listController.js';
 import listItemController from '../controllers/listItemController.js';
+import listNoteController from '../controllers/listNoteController.js';
 import permissionHandler from '../middleware/permissionHandler.js';
 
 const rules = permissionHandler.accessRules;
@@ -24,7 +25,7 @@ router.post(
 router.get(
     '/',
     permissionHandler.authenticateOptional,
-    permissionHandler.accessRules(
+    permissionHandler.authorizeAccess(
         rules.loggedInUserIsRole("ADMIN")
     ),
     listController.getAll
@@ -35,7 +36,7 @@ router.get(
     permissionHandler.authenticateOptional,
     paramValidator.validateListId,
     paramValidator.loadAssociatedList,
-    permissionHandler.accessRules(
+    permissionHandler.authorizeAccess(
         rules.OR(
             rules.loggedInUserIsRole("ADMIN"),
             rules.loggedInUserOwnsAssociatedList(),
@@ -50,7 +51,7 @@ router.get(
     permissionHandler.authenticateOptional,
     paramValidator.validateListId,
     paramValidator.loadAssociatedList,
-    permissionHandler.accessRules(
+    permissionHandler.authorizeAccess(
         rules.OR(
             rules.loggedInUserIsRole("ADMIN"),
             rules.loggedInUserOwnsAssociatedList(),
@@ -58,6 +59,21 @@ router.get(
         )
     ),
     listItemController.getAllForList,
+);
+
+router.get(
+    '/:list_id/notes',
+    permissionHandler.authenticateOptional,
+    paramValidator.validateListId,
+    paramValidator.loadAssociatedList,
+    permissionHandler.authorizeAccess(
+        rules.OR(
+            rules.loggedInUserIsRole("ADMIN"),
+            rules.loggedInUserOwnsAssociatedList(),
+            rules.associatedListIsPublic()
+        )
+    ),
+    listNoteController.getAllForList,
 );
 
 router.put(

@@ -20,6 +20,11 @@ export default {
         res.status(200).json(lists);
     },
 
+    async getAllForUser(req, res) {
+        let lists = await listService.getAllForUser(req.associatedUser.id);
+        res.status(200).json(lists);
+    },
+
     async getById(req, res) {
         const id = parseInt(req.params.list_id);
         const list = await listService.getById(id);

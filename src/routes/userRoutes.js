@@ -41,7 +41,7 @@ router.get(
             rules.associatedUserIsLoggedIn(),
         ),
     ),
-    listController.get
+    listController.getAllForUser
 );
 
 router.put(

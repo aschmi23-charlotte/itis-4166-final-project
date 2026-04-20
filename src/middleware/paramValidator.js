@@ -30,9 +30,8 @@ export default {
             user_id = parseInt(user_id_str);
         }
 
-        let user = userService.getById(user_id);
+        let user = await userService.getById(user_id);
         req.associatedUser = user;
-
         next();
     },
 
