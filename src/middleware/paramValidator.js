@@ -25,6 +25,13 @@ export default {
         let user_id = null;
         
         if (user_id_str === 'me') {
+            // Can happen on routes using optional authentication:
+            if (req.user.id === null) {
+                const err = new Error("Special 'user_id' parameter value 'me' required authentication. Please provide valid token.");
+                err.status = 401;
+                throw err;
+            }
+
             user_id = req.user.id;
         } else {
             user_id = parseInt(user_id_str);

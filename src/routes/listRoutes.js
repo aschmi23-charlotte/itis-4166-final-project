@@ -33,7 +33,7 @@ router.get(
 
 router.get(
     '/public',
-    permissionHandler.authenticate,
+    permissionHandler.authenticateOptional,
     listController.getAllPublic
 );
 
