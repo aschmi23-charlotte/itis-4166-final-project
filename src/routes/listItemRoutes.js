@@ -26,6 +26,13 @@ router.get(
     permissionHandler.authenticateOptional,
     paramValidator.validateItemId,
     paramValidator.loadAssociatedListItem,
+    permissionHandler.authorizeAccess(
+        rules.OR(
+            rules.loggedInUserIsRole('ADMIN'),
+            rules.loggedInUserOwnsAssociatedList(),
+            rules.associatedListIsPublic(),
+        ),
+    ),
     listItemController.getById,
 );
 

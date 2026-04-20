@@ -1,5 +1,6 @@
 import express from 'express';
 import userController from '../controllers/userController.js';
+import listController from '../controllers/listController.js';
 
 import permissionHandler from '../middleware/permissionHandler.js';
 import userValidator from '../middleware/userValidator.js';
@@ -28,6 +29,21 @@ router.get(
     ),
     userController.getById,
 );
+
+router.get(
+    '/:user_id/lists',
+    permissionHandler.authenticate,
+    paramValidator.validateUserId,
+    paramValidator.handleUserIdIsMe,
+    permissionHandler.authorizeAccess(
+        rules.OR(
+            rules.loggedInUserIsRole('ADMIN'),
+            rules.loggedInUserIsUserId(),
+        ),
+    ),
+    listController.get
+);
+
 router.put(
     '/:user_id',
     permissionHandler.authenticate,

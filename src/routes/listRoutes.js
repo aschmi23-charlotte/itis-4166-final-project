@@ -21,19 +21,42 @@ router.post(
     listController.create,
 );
 
-router.get('/', permissionHandler.authenticateOptional, listController.getAll);
+router.get(
+    '/',
+    permissionHandler.authenticateOptional,
+    permissionHandler.accessRules(
+        rules.loggedInUserIsRole("ADMIN")
+    ),
+    listController.getAll
+);
+
 router.get(
     '/:list_id',
     permissionHandler.authenticateOptional,
     paramValidator.validateListId,
     paramValidator.loadAssociatedList,
+    permissionHandler.accessRules(
+        rules.OR(
+            rules.loggedInUserIsRole("ADMIN"),
+            rules.loggedInUserOwnsAssociatedList(),
+            rules.associatedListIsPublic()
+        )
+    ),
     listController.getById,
 );
+
 router.get(
     '/:list_id/items',
     permissionHandler.authenticateOptional,
     paramValidator.validateListId,
     paramValidator.loadAssociatedList,
+    permissionHandler.accessRules(
+        rules.OR(
+            rules.loggedInUserIsRole("ADMIN"),
+            rules.loggedInUserOwnsAssociatedList(),
+            rules.associatedListIsPublic()
+        )
+    ),
     listItemController.getAllForList,
 );
 

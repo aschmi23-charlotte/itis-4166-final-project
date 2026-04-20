@@ -9,6 +9,10 @@ export default {
         return listRepo.getAll();
     },
 
+    async getAllForUser(ownerId) {
+        return listRepo.getAllForUser(ownerId);
+    },
+
     async getById(id) {
         const list = await listRepo.getById(id);
         if (list) {

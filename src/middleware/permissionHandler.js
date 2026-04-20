@@ -44,7 +44,7 @@ export default {
         if (!authHeader || !authHeader.startsWith('Bearer ')) {
             return next();
         }
-
+        
         const token = authHeader.split(' ')[1];
 
         try {
@@ -129,7 +129,7 @@ export default {
                 }
 
                 // We only reach this point if we forgot to call a middleware that loads an associated list.
-                let err = new Error('req.associatedList was not loaded');
+                let err = new Error ("req.associatedList was not loaded");
                 err.status = 500;
                 throw err;
             };
@@ -142,11 +142,22 @@ export default {
                     let list = await listService.getById(req.body.listId);
                     return list.ownerId === req.user.id;
                 }
-
+                
                 // We should only reach this point if the request body wasn't validated.
-                let err = new Error(
-                    'req.body was not properly validated: req.body.listId is missing.',
-                );
+                let err = new Error ("req.body was not properly validated: req.body.listId is missing.");
+                err.status = 500;
+                throw err;
+            };
+        },
+
+        associatedListIsPublic() {
+            return async function (req) {
+                if (req.associatedList) {
+                    return req.associatedList.isPublic;
+                }
+                
+                // We only reach this point if we forgot to call a middleware that loads an associated list.
+                let err = new Error ("req.associatedList was not loaded");
                 err.status = 500;
                 throw err;
             };

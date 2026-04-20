@@ -26,6 +26,13 @@ router.get(
     permissionHandler.authenticateOptional,
     paramValidator.validateNoteId,
     paramValidator.loadAssociatedListNote,
+    permissionHandler.authorizeAccess(
+        rules.OR(
+            rules.loggedInUserIsRole('ADMIN'),
+            rules.loggedInUserOwnsAssociatedList(),
+            rules.associatedListIsPublic(),
+        ),
+    ),
     listNoteController.getById,
 );
 
