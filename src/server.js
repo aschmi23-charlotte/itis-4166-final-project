@@ -6,6 +6,7 @@ import yaml from 'js-yaml';
 import fs from 'fs';
 import listRoutes from './routes/listRoutes.js';
 import listItemRoutes from './routes/listItemRoutes.js';
+import listNoteRoutes from './routes/listNoteRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 
@@ -32,6 +33,7 @@ app.get('/health', (req, res) => {
 
 app.use('/api/list', listRoutes);
 app.use('/api/listitem', listItemRoutes);
+app.use('/api/listnote', listNoteRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 

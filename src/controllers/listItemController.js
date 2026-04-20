@@ -12,18 +12,19 @@ export default {
             details,
             listId,
         });
+        res.status(201).json(newItem);
     },
 
     async getAllForList(req, res) {
         const id = parseInt(req.params.list_id);
-        const list = await listItemService.getAllForList(id);
-        res.status(200).json(list);
+        const items = await listItemService.getAllForList(id);
+        res.status(200).json(items);
     },
 
     async getById(req, res) {
         const id = parseInt(req.params.item_id);
-        const list = await listItemService.getById(id);
-        res.status(200).json(list);
+        const item = await listItemService.getById(id);
+        res.status(200).json(item);
     },
 
     async update(req, res) {

@@ -4,14 +4,14 @@ import userRepo from './userRepo.js';
 export default {
     async create(data) {
         try {
-            const list = await prisma.toDoListItem.create({ data: data });
+            const list = await prisma.toDoListNote.create({ data: data });
             return list;
 
         } catch (error) {
 
             if (error.code === 'P2003') {
                 const newError = new Error(
-                    `Cannot create To-Do List Item: referenced list with id ${data.listId} does not exist`,
+                    `Cannot create To-Do List Note: referenced list with id ${data.listId} does not exist`,
                 );
                 newError.status = 400;
                 console.log(newError);
@@ -24,18 +24,18 @@ export default {
     },
 
     async getAllForList(listId) {
-        const list = await prisma.toDoListItem.findMany({ where: { listId } });
+        const list = await prisma.toDoListNote.findMany({ where: { listId } });
         return list;
     },
 
     async getById(id) {
-        const list = await prisma.toDoListItem.findUnique({ where: { id } });
+        const list = await prisma.toDoListNote.findUnique({ where: { id } });
         return list;
     },
 
     async update(id, updateData) {
         try {
-            const list = await prisma.toDoListItem.update({
+            const list = await prisma.toDoListNote.update({
                 where: { id },
                 data: updateData,
             });
@@ -48,7 +48,7 @@ export default {
 
     async remove(id) {
         try {
-            const list = await prisma.toDoListItem.delete({
+            const list = await prisma.toDoListNote.delete({
                 where: { id },
             });
             return list;

@@ -108,6 +108,7 @@ export default {
             };
         },
 
+        // Needs to be seperate since owner ID could possibly be undefined.
         loggedInUserOwnsNewList() {
             return function (req) {
                 /// ownerId will be defaulted to the logged in user is not present.

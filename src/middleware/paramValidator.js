@@ -43,6 +43,15 @@ export default {
             .bail(),
 
         handleValidationErrors,
+    ],    
+
+    validateNoteId: [
+        param('note_id')
+            .isInt()
+            .withMessage("URL parameter 'note_id' must be an integer")
+            .bail(),
+
+        handleValidationErrors,
     ],
 };
 
