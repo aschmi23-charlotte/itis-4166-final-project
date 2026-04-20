@@ -2,6 +2,7 @@ import express from 'express';
 import paramValidator from '../middleware/paramValidator.js';
 import listValidator from '../middleware/listValidator.js';
 import listController from '../controllers/listController.js';
+import listItemController from '../controllers/listItemController.js';
 import permissionHandler from '../middleware/permissionHandler.js';
 
 const rules = permissionHandler.accessRules;
@@ -22,6 +23,7 @@ router.post(
 
 router.get('/', permissionHandler.authenticateOptional, listController.getAll);
 router.get('/:list_id', permissionHandler.authenticateOptional, paramValidator.validateListId, listController.getById);
+router.get('/:list_id/items', permissionHandler.authenticateOptional, paramValidator.validateListId, listItemController.getAllForList);
 
 router.put(
     '/:list_id',

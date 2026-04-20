@@ -23,8 +23,8 @@ export default {
         }
     },
 
-    async getAllForList(ownerId) {
-        const list = await prisma.toDoListItem.findMany({ where: { ownerId } });
+    async getAllForList(listId) {
+        const list = await prisma.toDoListItem.findMany({ where: { listId } });
         return list;
     },
 

@@ -14,6 +14,12 @@ export default {
         });
     },
 
+    async getAllForList(req, res) {
+        const id = parseInt(req.params.list_id);
+        const list = await listItemService.getAllForList(id);
+        res.status(200).json(list);
+    },
+
     async getById(req, res) {
         const id = parseInt(req.params.item_id);
         const list = await listItemService.getById(id);
