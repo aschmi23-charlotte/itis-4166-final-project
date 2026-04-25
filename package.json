@@ -4,11 +4,13 @@
   "description": "A Node.js + Express + Prisma To-Do List API",
   "main": "src/server.js",
   "scripts": {
-    "dev": "node --env-file=.env --watch src/server.js",
-    "start": "node src/server.js",
+    "start:dev": "node --env-file=.env --watch src/server.js",
+    "start:prod": "node src/server.js",
     "migrate:dev": "npx prisma migrate dev",
     "migrate:deploy": "npx prisma migrate deploy",
     "generate:client": "npx prisma generate client",
+    "build:dev": "npm install && npm run migrate:deploy && npm run generate:client && npm run seed:dev",
+    "build:prod": "npm install --omit=dev && npm run migrate:deploy && npm run generate:client && npm run seed:prod",
     "seed:dev": "node --env-file=.env prisma/seed.js",
     "seed:prod": "node prisma/seed.js"
   },

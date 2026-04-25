@@ -12,7 +12,7 @@ import userRoutes from './routes/userRoutes.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const NODE_ENV = process.env.development || 'production';
+const NODE_ENV = process.env.NODE_ENV || 'production';
 
 app.use(cors());
 app.use(express.json());
