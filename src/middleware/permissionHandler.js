@@ -6,15 +6,6 @@ import listService from '../services/listService.js';
 import listItemService from '../services/listItemService.js';
 import listNoteService from '../services/listNoteService.js';
 
-// Shorthand for access failure.
-function throw_invalid_access_rule(str, explanation) {
-    const err = new Error(
-        `Internal Server Error: Invalid access rule ${str} - ${explanation}`,
-    );
-    err.status = 500;
-    return next(err);
-}
-
 export default {
     authenticate(req, res, next) {
         const err = new Error('Not authenticated. Please provide valid token.');
@@ -73,6 +64,7 @@ export default {
             }
         };
     },
+    
     // Function factories for rules
     accessRules: {
         // Checking multiple rules:
