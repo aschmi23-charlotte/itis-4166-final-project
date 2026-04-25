@@ -44,7 +44,7 @@ model ToDoListItem {
   id Int @id @default(autoincrement())
   name String
   details String?
-  deadline DateTime? @default(now()) @map("deadline")
+  // deadline DateTime? @default(now()) @map("deadline")
   createdAt DateTime @default(now()) @map("created_at")
   list ToDoList @relation(fields: [listId], references: [id], onDelete: Cascade)
   listId Int @map("list_id")
