@@ -10,6 +10,8 @@ servers:
     description: Production server
 
 tags:
+  - name: Lists
+    description: List-related endpoints
   - name: Users
     description: User-related endpoints
   - name: Auth
@@ -94,7 +96,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/UserInfo"
         '400':
-          description: Invalid update
+          description: Invalid Request
           content:
             application/json:
               schema:
@@ -111,6 +113,7 @@ paths:
                     "Validation failed"
                   details:
                     - "At least one field (email, password) must be provided"
+                    - "URL parameter 'user_id' must be a positive integer, or the string 'me'"
         '401':
           $ref: "#/components/responses/Unauthorized"
         '403':
@@ -149,7 +152,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/UserInfo"
         '400':
-          description: Invalid update
+          description: Invalid Request
           content:
             application/json:
               schema:
@@ -166,12 +169,95 @@ paths:
                     "Validation failed"
                   details:
                     - "role must be a string"
+                    - "URL parameter 'user_id' must be a positive integer, or the string 'me'"
         '401':
           $ref: "#/components/responses/Unauthorized"
         '403':
           $ref: "#/components/responses/Forbidden"
         '404':
           $ref: '#/components/responses/UserNotFound'
+    delete:
+      security:
+        - bearerAuth: []
+      tags:
+        - Users
+      summary: Delete User
+      description: Delete a the specified user. USER roles may delete themselves. ADMIN roles may delete any user.
+      parameters:
+        - $ref: '#/components/parameters/UserID'
+      responses:
+        '204':
+          description: User deleted successfully
+        '400':
+          $ref: '#/components/responses/InvalidUserId'
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '403':
+          $ref: "#/components/responses/Forbidden"
+        '404':
+          $ref: '#/components/responses/UserNotFound'
+
+  /users/{user_id}/lists/all:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - Users
+        - Lists
+      summary: Get all To-Do Lists for a specified user.
+      description: 
+        Retrieves all To-Do Lists for a specified user. USER roles may only access their own lists with this endpoint.
+        ADMIN roles can access lists for all users.
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+      responses:
+        '200':
+          description: All To-Do Lists for the specified user.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ToDoList'
+        '400':
+          $ref: '#/components/responses/InvalidUserId'
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '403':
+          $ref: "#/components/responses/Forbidden"
+        '404':
+          $ref: '#/components/responses/UserNotFound'
+
+  /users/{user_id}/lists/public:
+    get:
+      security:
+        - bearerAuth: []
+        - {}
+      tags:
+        - Users
+        - Lists
+      summary: Get all public To-Do Lists for a specified user.
+      description: 
+        Retrieves all public To-Do Lists for a specified user. Anyone can acccess, but authentication is still
+        required if 'user_id' is set to 'me', since that value implies that a user is logged in.
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+      responses:
+        '200':
+          description: All public To-Do Lists for the specified user.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ToDoList'
+        '400':
+          $ref: '#/components/responses/InvalidUserId'
+        '401':
+          $ref: "#/components/responses/UnauthorizedOptional"
+        '404':
+          $ref: '#/components/responses/UserNotFound'
+
   /auth/login:
     post:
       tags:
@@ -269,18 +355,36 @@ components:
       properties:
         id:
           type: integer
+          example: 1
         email:
           type: string
+          example: "user@example.com"
         role:
           type: string
+          example: USER
         createdAt:
           type: string
-      example:
-        id: 1
-        email: "user@example.com"
-        role: USER
-        createdAt: "2026-04-25T22:01:26.110Z"
+          example: "2026-04-25T22:01:26.110Z"
   
+    ToDoList:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: "To-Do List 1"
+        isPublic:
+          type: boolean
+          example: false
+        ownerId:
+          type: integer
+          example: 1
+        createdAt:
+          type: string
+          example: "2026-04-25T22:01:26.110Z"
+
   parameters: 
     UserId:
       name: user_id
@@ -324,6 +428,18 @@ components:
         example: 1
 
   responses:
+    ToDoListNotFound:
+      description: ToDoList not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error: 
+                type: string
+            example: 
+              error: 'To-Do List 1 not found'
+
     UserNotFound:
       description: User not found
       content:

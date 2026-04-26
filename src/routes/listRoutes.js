@@ -23,7 +23,7 @@ router.post(
 );
 
 router.get(
-    '/',
+    '/all',
     permissionHandler.authenticate,
     permissionHandler.authorizeAccess(
         rules.loggedInUserIsRole("ADMIN")
@@ -44,12 +44,40 @@ router.get(
     paramValidator.loadAssociatedList,
     permissionHandler.authorizeAccess(
         rules.OR(
+            rules.associatedListIsPublic(),
             rules.loggedInUserIsRole("ADMIN"),
             rules.loggedInUserOwnsAssociatedList(),
-            rules.associatedListIsPublic()
         )
     ),
     listController.getById,
+);
+
+router.put(
+    '/:list_id',
+    permissionHandler.authenticate,
+    paramValidator.validateListId,
+    paramValidator.loadAssociatedList,
+    permissionHandler.authorizeAccess(
+        rules.OR(
+            rules.loggedInUserIsRole('ADMIN'),
+            rules.loggedInUserOwnsAssociatedList(),
+        ),
+    ),
+    listValidator.validateUpdate,
+    listController.update,
+);
+router.delete(
+    '/:list_id',
+    permissionHandler.authenticate,
+    paramValidator.validateListId,
+    paramValidator.loadAssociatedList,
+    permissionHandler.authorizeAccess(
+        rules.OR(
+            rules.loggedInUserIsRole('ADMIN'),
+            rules.loggedInUserOwnsAssociatedList(),
+        ),
+    ),
+    listController.delete,
 );
 
 router.get(
@@ -80,34 +108,6 @@ router.get(
         )
     ),
     listNoteController.getAllForList,
-);
-
-router.put(
-    '/:list_id',
-    permissionHandler.authenticate,
-    paramValidator.validateListId,
-    paramValidator.loadAssociatedList,
-    permissionHandler.authorizeAccess(
-        rules.OR(
-            rules.loggedInUserIsRole('ADMIN'),
-            rules.loggedInUserOwnsAssociatedList(),
-        ),
-    ),
-    listValidator.validateUpdate,
-    listController.update,
-);
-router.delete(
-    '/:list_id',
-    permissionHandler.authenticate,
-    paramValidator.validateListId,
-    paramValidator.loadAssociatedList,
-    permissionHandler.authorizeAccess(
-        rules.OR(
-            rules.loggedInUserIsRole('ADMIN'),
-            rules.loggedInUserOwnsAssociatedList(),
-        ),
-    ),
-    listController.delete,
 );
 
 export default router;
