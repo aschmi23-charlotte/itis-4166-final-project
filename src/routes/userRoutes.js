@@ -68,7 +68,7 @@ router.delete(
 );
 
 router.get(
-    '/:user_id/lists/all',
+    '/:user_id/list/all',
     permissionHandler.authenticate,
     paramValidator.validateUserId,
     paramValidator.loadAssociatedUser,
@@ -82,7 +82,7 @@ router.get(
 );
 
 router.get(
-    '/:user_id/lists/public',
+    '/:user_id/list/public',
     permissionHandler.authenticateOptional,
     paramValidator.validateUserId,
     paramValidator.loadAssociatedUser,

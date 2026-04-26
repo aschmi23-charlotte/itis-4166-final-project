@@ -1,5 +1,6 @@
 import { body, query, oneOf } from 'express-validator';
 import { handleValidationErrors } from './handleValidationErrors.js';
+import listRepo from '../repositories/listRepo.js';
 
 export default {
     validateCreate: [
@@ -26,10 +27,8 @@ export default {
 
         body('ownerId')
             .optional()
-            .trim()
-            .escape()
-            .isInt()
-            .withMessage('If present, the "ownerId" must be an integer')
+            .isInt({min: 1})
+            .withMessage('If present, the "ownerId" must be a positive integer')
             .bail(),
 
         handleValidationErrors,

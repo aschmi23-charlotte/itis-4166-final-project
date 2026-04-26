@@ -6,6 +6,32 @@ import listService from '../services/listService.js';
 import listItemService from '../services/listItemService.js';
 import listNoteService from '../services/listNoteService.js';
 
+function ensureOptionalAuth(req) {
+    if (req.user.id === null || req.user.role === null) {
+        const err = new Error("The requested resource requires authentication. Please provide a valid token.");
+        err.status = 401;
+        throw err;
+    }
+}
+
+function ensureAssociatedUser(req) {
+    if (req.associatedUser === undefined) {
+        // We only reach this point if we forgot to call a middleware that loads an associated list.
+        let err = new Error ("req.associatedUser was not loaded");
+        err.status = 500;
+        throw err;
+    }
+}
+
+function ensureAssociatedList(req) {
+    if (req.associatedList === undefined) {
+        // We only reach this point if we forgot to call a middleware that loads an associated list.
+        let err = new Error ("req.associatedList was not loaded");
+        err.status = 500;
+        throw err;
+    }
+}
+
 export default {
     authenticate(req, res, next) {
         const err = new Error('Not authenticated. Please provide valid token.');
@@ -74,8 +100,7 @@ export default {
 
                 for (let i = 0; i < rules.length; i++) {
                     let approved = await rules[i](req);
-
-                    if (approved) {return false;}
+                    if (!approved) {return false;}
                 }
 
                 return true;
@@ -86,7 +111,6 @@ export default {
             return async function (req) {
                 for (let i = 0; i < rules.length; i++) {
                     let approved = await rules[i](req);
-
                     if (approved) {return true;}
                 }
 
@@ -96,20 +120,17 @@ export default {
 
         loggedInUserIsRole(...roles) {
             return async function (req) {
+                ensureOptionalAuth(req);
                 return roles.includes(req.user.role);
             };
         },
 
         associatedUserIsLoggedIn() {
             return async function (req) {
-                if (req.associatedUser) {
-                    return req.associatedUser.id === req.user.id;
-                }
-
-                // We only reach this point if we forgot to call a middleware that loads an associated list.
-                let err = new Error ("req.associatedUser was not loaded");
-                err.status = 500;
-                throw err;
+                ensureOptionalAuth(req);
+                ensureAssociatedUser(req);
+                return req.associatedUser.id === req.user.id;
+                
             };
         },
 
@@ -125,19 +146,18 @@ export default {
 
         loggedInUserOwnsAssociatedList() {
             return async function (req) {
-                if (req.associatedList) {
-                    return req.associatedList.ownerId === req.user.id;
-                }
+                ensureOptionalAuth(req);
+                ensureAssociatedList(req);
 
-                // We only reach this point if we forgot to call a middleware that loads an associated list.
-                let err = new Error ("req.associatedList was not loaded");
-                err.status = 500;
-                throw err;
+                return req.associatedList.ownerId === req.user.id;
+
             };
         },
 
         loggedInUserOwnsListFromReqBody() {
             return async function (req) {
+                ensureOptionalAuth(req);
+
                 if (req.body.listId) {
                     // List id specified in the JSON body.
                     let list = await listService.getById(req.body.listId);
@@ -153,14 +173,11 @@ export default {
 
         associatedListIsPublic() {
             return async function (req) {
+                ensureAssociatedList(req);
                 if (req.associatedList) {
                     return req.associatedList.isPublic;
                 }
                 
-                // We only reach this point if we forgot to call a middleware that loads an associated list.
-                let err = new Error ("req.associatedList was not loaded");
-                err.status = 500;
-                throw err;
             };
         },
     },
