@@ -2,16 +2,238 @@ openapi: 3.1.0
 info:
   title: Task API
   version: 1.0.0
+
 servers:
-  - url: http://localhost:3000
+  - url: http://localhost:8080/api
     description: Local development servers
+  - url: https://itis-4166-final-project-au83.onrender.com/api
+    description: Production server
 
 tags:
-  - name: Tasks
-    description: Task-related endpoints
+  - name: Users
+    description: User-related endpoints
+  - name: Auth
+    description: Authentication-related endpoints
   - name: Monitoring
     description: Operational endpoints, such as health checks
+
 paths:
+  /users:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - Users
+      summary: Get all users
+      description: Retrieves UserInfo for all users. Only available to the ADMIN role.
+      responses:
+        '200':
+          description: A list of all users with user info.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserInfo'
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '403':
+          $ref: "#/components/responses/Forbidden"
+
+  /users/{user_id}:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - Users
+      summary: Get a specific user
+      description: Retrieves UserInfo for a user. USER roles may only access themselves. ADMIN roles can access all users.
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+      responses:
+        '200':
+          description: Info for the specified user
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserInfo'
+        '400':
+          $ref: '#/components/responses/InvalidUserId'
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '403':
+          $ref: "#/components/responses/Forbidden"
+        '404':
+          $ref: '#/components/responses/UserNotFound'
+    put:
+      security:
+        - bearerAuth: []
+      tags:
+        - Users
+      summary: Updates info for a specific user.
+      description:
+        Updates info for a specific user. Used to change email and password for the account. 
+        USER roles may only update themselves. ADMIN roles can update all users.
+        User roles cannot be set using a put request.
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+      requestBody:
+        description: The new email and/or password for the specified user.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AuthCredentials"
+      responses:
+        '200':
+          description: The updated user.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserInfo"
+        '400':
+          description: Invalid update
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error: 
+                    type: string
+                  details:
+                    type: array
+                    items:
+                      type: string
+                example: 
+                  error:
+                    "Validation failed"
+                  details:
+                    - "At least one field (email, password) must be provided"
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '403':
+          $ref: "#/components/responses/Forbidden"
+        '404':
+          $ref: '#/components/responses/UserNotFound'
+        '409':
+          $ref: "#/components/responses/DuplicateEmail"
+    patch:
+      security:
+        - bearerAuth: []
+      tags:
+        - Users
+      summary: Updates the role of a specific user.
+      description:
+        Updates the role of a specific. For ADMIN use only.
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+      requestBody:
+        description: The new role for the specified user
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                role:
+                  type: string
+              example:
+                role: "ADMIN"
+      responses:
+        '200':
+          description: The updated user.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserInfo"
+        '400':
+          description: Invalid update
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error: 
+                    type: string
+                  details:
+                    type: array
+                    items:
+                      type: string
+                example: 
+                  error:
+                    "Validation failed"
+                  details:
+                    - "role must be a string"
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '403':
+          $ref: "#/components/responses/Forbidden"
+        '404':
+          $ref: '#/components/responses/UserNotFound'
+  /auth/login:
+    post:
+      tags:
+        - Auth
+      summary: Authenticate user
+      description: Authenticate a user and return an access token.
+      requestBody:
+        description: User login credentials
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AuthCredentials"
+      responses:
+        '200':
+          description: Authentication successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken:
+                    type: string
+                example: 
+                  accessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        '400':
+          $ref: "#/components/responses/InvalidAuthInput"
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                example: 
+                  error: "Invalid credentials"
+  /auth/signup:
+    post:
+      tags:
+        - Auth
+      summary: Signup new user
+      description: Creates a new user account with a given email and password
+      requestBody:
+        description: New user login credentials
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AuthCredentials"
+      responses:
+        '201':
+          description: New user successfully created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserInfo"
+        '400':
+          $ref: "#/components/responses/InvalidAuthInput"
+        '409':
+          $ref: "#/components/responses/DuplicateEmail"
   /health:
     get:
       summary: Health Check
@@ -30,6 +252,181 @@ paths:
                     type: string
                     example: ok
 components:
-  schemas: {}
-  parameters: {}
+  schemas: 
+    # User/Auth Schemas:
+    AuthCredentials:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+      example:
+        email: "user@example.com"
+        password: password123
+    UserInfo:
+      type: object
+      properties:
+        id:
+          type: integer
+        email:
+          type: string
+        role:
+          type: string
+        createdAt:
+          type: string
+      example:
+        id: 1
+        email: "user@example.com"
+        role: USER
+        createdAt: "2026-04-25T22:01:26.110Z"
   
+  parameters: 
+    UserId:
+      name: user_id
+      in: path
+      required: true
+      description: 
+        The id of a user. A value of 'me' will indicate the currently logged in user. 
+        Otherwise, the string should be a parsable as a valid integer.
+      schema:
+        type: string
+        example: 'me'
+
+    ListId:
+      name: list_id
+      in: path
+      required: true
+      description: 
+        The id of a ToDoList.
+      schema:
+        type: string
+        example: 1
+
+    ItemId:
+      name: item_id
+      in: path
+      required: true
+      description: 
+        The id of a ToDoListItem.
+      schema:
+        type: string
+        example: 1
+
+    NoteId:
+      name: note_id
+      in: path
+      required: true
+      description: 
+        The id of a ToDoListNote.
+      schema:
+        type: string
+        example: 1
+
+  responses:
+    UserNotFound:
+      description: User not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error: 
+                type: string
+            example: 
+              error: 'User 1 not found'
+
+    Unauthorized:
+      description: Client is not authenticated
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error: 
+                type: string
+            example: 
+              error: "Not authenticated. Please provide a valid token."
+
+    UnauthorizedOptional:
+      description: Client is not authenticated, and parameter required authentication.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error: 
+                type: string
+            example: 
+              error: "Special 'user_id' parameter value 'me' required authentication. Please provide valid token."
+
+    Forbidden:
+      description: User does not have sufficient permissions.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error: 
+                type: string
+            example: 
+              error:
+                - "Forbidden: insufficient permission"
+
+    InvalidUserId:
+      description: Invalid User ID
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error: 
+                type: string
+              details:
+                type: array
+                items:
+                  type: string
+            example: 
+              error:
+                "Validation failed"
+              details:
+                - "URL parameter 'user_id' must be a positive integer, or the string 'me'"
+
+
+    InvalidAuthInput:
+      description: Bad request due to invalid data
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error: 
+                type: string
+              details:
+                type: array
+                items:
+                  type: string
+            example: 
+              error:
+                "Validation failed"
+              details:
+                - "Email is required"
+                - "Password is required"
+    
+    DuplicateEmail:
+      description: Duplicate email
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+            example: 
+              error: "Email has already been used"
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

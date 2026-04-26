@@ -152,7 +152,7 @@ export default {
             .trim()
             .escape()
             .isString()
-            .withMessage('Role must be a string')
+            .withMessage('role must be a string')
             .bail()
             .custom(checkRole),
         handleValidationErrors,

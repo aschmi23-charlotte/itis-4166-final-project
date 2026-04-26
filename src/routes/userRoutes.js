@@ -30,6 +30,43 @@ router.get(
     userController.getById,
 );
 
+router.put(
+    '/:user_id',
+    permissionHandler.authenticate,
+    paramValidator.validateUserId,
+    userValidator.validateUpdate,
+    paramValidator.loadAssociatedUser,
+    permissionHandler.authorizeAccess(
+        rules.OR(
+            rules.loggedInUserIsRole('ADMIN'),
+            rules.associatedUserIsLoggedIn(),
+        ),
+    ),
+    userController.update,
+);
+router.patch(
+    '/:user_id',
+    permissionHandler.authenticate,
+    paramValidator.validateUserId,
+    userValidator.validatePatch,
+    paramValidator.loadAssociatedUser,
+    permissionHandler.authorizeAccess(rules.loggedInUserIsRole('ADMIN')),
+    userController.patch,
+);
+router.delete(
+    '/:user_id',
+    permissionHandler.authenticate,
+    paramValidator.validateUserId,
+    paramValidator.loadAssociatedUser,
+    permissionHandler.authorizeAccess(
+        rules.OR(
+            rules.loggedInUserIsRole('ADMIN'),
+            rules.associatedUserIsLoggedIn(),
+        ),
+    ),
+    userController.remove,
+);
+
 router.get(
     '/:user_id/lists',
     permissionHandler.authenticate,
@@ -52,41 +89,5 @@ router.get(
     listController.getAllPublicForUser
 );
 
-router.put(
-    '/:user_id',
-    permissionHandler.authenticate,
-    paramValidator.validateUserId,
-    paramValidator.loadAssociatedUser,
-    permissionHandler.authorizeAccess(
-        rules.OR(
-            rules.loggedInUserIsRole('ADMIN'),
-            rules.associatedUserIsLoggedIn(),
-        ),
-    ),
-    userValidator.validateUpdate,
-    userController.update,
-);
-router.patch(
-    '/:user_id',
-    permissionHandler.authenticate,
-    paramValidator.validateUserId,
-    paramValidator.loadAssociatedUser,
-    permissionHandler.authorizeAccess(rules.loggedInUserIsRole('ADMIN')),
-    userValidator.validatePatch,
-    userController.patch,
-);
-router.delete(
-    '/:user_id',
-    permissionHandler.authenticate,
-    paramValidator.validateUserId,
-    paramValidator.loadAssociatedUser,
-    permissionHandler.authorizeAccess(
-        rules.OR(
-            rules.loggedInUserIsRole('ADMIN'),
-            rules.associatedUserIsLoggedIn(),
-        ),
-    ),
-    userController.remove,
-);
 
 export default router;

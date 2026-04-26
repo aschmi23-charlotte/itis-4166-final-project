@@ -9,12 +9,12 @@ export default {
     validateUserId: [
         oneOf(
             [
-                param('user_id').isInt().bail(),
+                param('user_id').isInt({ min: 1 }).bail(),
                 param('user_id').isString().equals('me').bail(),
             ],
             {
                 message:
-                    "URL parameter 'user_id' must be an integer, or the string 'me'",
+                    "URL parameter 'user_id' must be a positive integer, or the string 'me'",
             },
         ),
         handleValidationErrors,
@@ -44,8 +44,8 @@ export default {
 
     validateListId: [
         param('list_id')
-            .isInt()
-            .withMessage("URL parameter 'list_id' must be an integer")
+            .isInt({ min: 1 })
+            .withMessage("URL parameter 'list_id' must be a positive integer")
             .bail(),
 
         handleValidationErrors,
@@ -53,8 +53,8 @@ export default {
 
     validateItemId: [
         param('item_id')
-            .isInt()
-            .withMessage("URL parameter 'item_id' must be an integer")
+            .isInt({ min: 1 })
+            .withMessage("URL parameter 'item_id' must be a positive integer")
             .bail(),
 
         handleValidationErrors,
@@ -62,8 +62,8 @@ export default {
 
     validateNoteId: [
         param('note_id')
-            .isInt()
-            .withMessage("URL parameter 'note_id' must be an integer")
+            .isInt({ min: 1 })
+            .withMessage("URL parameter 'note_id' must be a positive  integer")
             .bail(),
 
         handleValidationErrors,
