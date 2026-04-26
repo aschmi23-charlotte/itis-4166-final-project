@@ -73,22 +73,24 @@ export default {
                 let approved = true;
 
                 for (let i = 0; i < rules.length; i++) {
-                    approved &&= await rules[i](req);
+                    let approved = await rules[i](req);
+
+                    if (approved) {return false;}
                 }
 
-                return approved;
+                return true;
             };
         },
 
         OR(...rules) {
             return async function (req) {
-                let approved = false;
-
                 for (let i = 0; i < rules.length; i++) {
-                    approved ||= await rules[i](req);
+                    let approved = await rules[i](req);
+
+                    if (approved) {return true;}
                 }
 
-                return approved;
+                return false;
             };
         },
 
