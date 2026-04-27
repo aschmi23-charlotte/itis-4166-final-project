@@ -1,0 +1,72 @@
+test_data: {}
+
+components:
+  responses:
+    Unauthorized:
+      test_steps: 
+        - Remove the JWT in SwaggerUI.
+        - Click *Try it out*.
+        - Any request made should return 401.
+        
+    UnauthorizedMe:
+      pass: null
+
+    UnauthorizedResource:
+      pass: null
+
+    Forbidden:
+      pass: null
+
+    # To Do List Errors:
+    InvalidListId:
+      test_steps: 
+        - Use a negative number as the list_id.
+        - Click *Try it out*.
+        - Any request made should return 401.
+
+    ToDoListNotFound:
+      pass: null
+
+    InvalidToDoListInput:
+      pass: null
+
+    # To Do List Item Errors:
+    InvalidItemId:
+      test_steps: 
+        - Use a negative number as the item_id.
+        - Click *Try it out*.
+        - Any request made should return 401.
+
+    ToDoListItemNotFound:
+      pass: null
+
+    InvalidToDoListItemInput:
+      pass: null
+
+# To Do List Note Errors:
+    InvalidNoteId:
+      test_steps: 
+        - Use a negative number as the note_id.
+        - Click *Try it out*.
+        - Any request made should return 401.
+    ToDoListNoteNotFound:
+      pass: null
+
+    InvalidToDoListNoteInput:
+      pass: null
+
+    # User Errors
+    UserNotFound:
+      pass: null
+
+    InvalidUserId:
+      test_steps: 
+        - Use a negative number as the user_id.
+        - Click *Try it out*.
+        - Any request made should return 401.
+
+    InvalidAuthInput:
+      pass: null
+    
+    DuplicateEmail:
+      pass: null

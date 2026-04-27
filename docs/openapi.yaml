@@ -51,10 +51,10 @@ paths:
                 $ref: "#/components/schemas/ToDoList"
         '400':
           $ref: "#/components/responses/InvalidToDoListInput"
-        '403':
-          $ref: "#/components/responses/Forbidden"
         '401':
           $ref: "#/components/responses/Unauthorized"
+        '403':
+          $ref: "#/components/responses/Forbidden"
   
   /list/all:
     get:

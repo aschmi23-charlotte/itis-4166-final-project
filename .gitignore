@@ -7,4 +7,5 @@ Thumbs.db
 ehthumbs.db
 Desktop.ini
 npm-debug.log*
-docs/_export_openapi.json
+docs/generated/
+!docs/generated/.gitkeep
