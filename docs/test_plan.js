@@ -40,7 +40,7 @@ const md_header = `
 * API URL: [https://itis-4166-final-project-au83.onrender.com/api](https://itis-4166-final-project-au83.onrender.com/api)
 * API Documentation: [https://itis-4166-final-project-au83.onrender.com/api-doc](https://itis-4166-final-project-au83.onrender.com/api-doc)
 
-## API Endpoints
+## API Endpoint Test Plan
 
 `;
 
@@ -62,18 +62,36 @@ for (let path in specs['paths']) {
     let endpoints = specs['paths'][path];
 
     for (let endpoint in endpoints) {
+        let endpoint_info = endpoints[endpoint];
+
         md_output += `* ${endpoint.toUpperCase()} ${path}\n`;
-        let responses = endpoints[endpoint]["responses"];
+
+
+        let access_control = endpoint_info["access_control"];
+        md_output += `  * Access Control: ${access_control}\n`;
+
+        md_output += `  * Test Setup:\n`;
+        if (endpoint_info["test_setup"] !== undefined) {
+            let test_setup = endpoint_info["test_setup"];
+
+            for (let i in test_setup) {
+                md_output += `    * ${test_setup[i]}\n`;
+            }
+        }
+
+        md_output += `  * Response Testing:\n`;
+
+        let responses = endpoint_info["responses"];
 
         for (let response in responses) {
             let response_info = responses[response];
-            md_output += `  * ${response}${response.startsWith('2') ? " (SUCCESS)" : ""} - ${response_info['description']}\n`;
+            md_output += `    * ${response}${response.startsWith('2') ? " (SUCCESS)" : ""} - ${response_info['description']}\n`;
 
             if (response_info["test_steps"] !== undefined) {
                 let test_steps = response_info["test_steps"];
 
                 for (let i in test_steps) {
-                    md_output += `    * ${test_steps[i]}\n`;
+                    md_output += `      * ${test_steps[i]}\n`;
                 }
             }
         }
@@ -81,8 +99,8 @@ for (let path in specs['paths']) {
 
 }
 
-console.log("================== Output ==================");
-console.log(md_output);
+// console.log("================== Output ==================");
+// console.log(md_output);
 fs.writeFileSync(md_output_path, md_output);
 
 // Having some trouble generating the PDF. We'll generate a word doc for now.
