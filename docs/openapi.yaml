@@ -11,9 +11,11 @@ servers:
 
 tags:
   - name: Lists
-    description: List related endpoints
+    description: ToDoList related endpoints
   - name: Items
-    description: List Item related endpoints
+    description: ToDoListItem related endpoints
+  - name: Notes
+    description: ToDoListNote related endpoints
   - name: Users
     description: User related endpoints
   - name: Auth
@@ -212,7 +214,7 @@ paths:
         - Items
       summary: Get all of the items for a specific to-do list
       description: 
-        Retrieves the ToDoLost data for a list. If the list is public, authentication is not required and anyone can access.
+        Retrieves all the ToDoListItem data for a list. If the list is public, authentication is not required and anyone can access.
         Otherwise, USER roles may only access private lists they own. ADMIN roles can access all lists.
       parameters:
         - $ref: '#/components/parameters/ListId'
@@ -225,6 +227,38 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ToDoListItem'
+        '400':
+          $ref: '#/components/responses/InvalidListId'
+        '401':
+          $ref: "#/components/responses/UnauthorizedResource"
+        '403':
+          $ref: "#/components/responses/Forbidden"
+        '404':
+          $ref: '#/components/responses/ToDoListNotFound'
+
+  /list/{list_id}/notes:
+    get:
+      security:
+        - bearerAuth: []
+        - {}
+      tags:
+        - Lists
+        - Notes
+      summary: Get all of the notes for a specific to-do list
+      description: 
+        Retrieves the ToDoLost data for a list. If the list is public, authentication is not required and anyone can access.
+        Otherwise, USER roles may only access private lists they own. ADMIN roles can access all lists.
+      parameters:
+        - $ref: '#/components/parameters/ListId'
+      responses:
+        '200':
+          description: All notes for the specified to-do list.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ToDoListNote'
         '400':
           $ref: '#/components/responses/InvalidListId'
         '401':
@@ -247,14 +281,14 @@ paths:
         they own. ADMIN roles can create a new to-do list item for any list.
       requestBody:
         description:
-          Data for the new to-do list. The attribute 'details' is optional.
+          Data for the new to-do list item. The attribute 'details' is optional.
         content:
           application/json:
             schema:
               $ref: "#/components/schemas/ToDoListItem"
       responses:
         '201':
-          description: ToDoList successfully created
+          description: ToDoListItem successfully created
           content:
             application/json:
               schema:
@@ -377,6 +411,152 @@ paths:
           $ref: "#/components/responses/Forbidden"
         '404':
           $ref: '#/components/responses/ToDoListItemNotFound'
+
+
+# ListNote Endpoints
+  /listnote:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - Notes
+      summary: Create a new to-do list note and add it to a to-do list.
+      description: 
+        Create a new to-do list note and adds it to a to-do list. USER roles can only create new notes for lists
+        they own. ADMIN roles can create a new to-do list note for any list.
+      requestBody:
+        description:
+          Data for the new to-do list note.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ToDoListNote"
+      responses:
+        '201':
+          description: ToDoListNote successfully created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ToDoListNote"
+        '400':
+          $ref: "#/components/responses/InvalidToDoListNoteInput"
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '403':
+          $ref: "#/components/responses/Forbidden"
+
+  /listnote/{note_id}:
+    get:
+      security:
+        - bearerAuth: []
+        - {}
+      tags:
+        - Notes
+      summary: Get a specific to-do list note
+      description: 
+        Retrieves the ToDoLostNote data for a list. If the associated list is public, authentication is not required and anyone
+        can access. Otherwise, USER roles may only access notes for private lists they own. ADMIN roles can access notes for
+        all lists.
+      parameters:
+        - $ref: '#/components/parameters/NoteId'
+      responses:
+        '200':
+          description: Info for the specified list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ToDoListNote'
+        '400':
+          $ref: '#/components/responses/InvalidNoteId'
+        '401':
+          $ref: "#/components/responses/UnauthorizedResource"
+        '403':
+          $ref: "#/components/responses/Forbidden"
+        '404':
+          $ref: '#/components/responses/ToDoListNoteNotFound'
+    put:
+      security:
+        - bearerAuth: []
+      tags:
+        - Notes
+      summary: Updates a specific to-do list note.
+      description:
+        Updates info for a specific to-do list note. Used to change 'name' and 'details' attributes. 
+        USER roles may only update notes for their own lists. ADMIN roles can update any list note.
+      parameters:
+        - $ref: '#/components/parameters/NoteId'
+      requestBody:
+        description: The new 'name' and/or 'details' attributes for the list note. Only one is required.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "To-Do List Note 1"
+                details:
+                  type: string
+                  optional: true
+                  example: "Additional info for note 1"
+      responses:
+        '200':
+          description: The updated list note.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ToDoListNote"
+        '400':
+          description: Invalid Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error: 
+                    type: string
+                  details:
+                    type: array
+                    items:
+                      type: string
+                example: 
+                  error:
+                    "Validation failed"
+                  details:
+                    - "At least one field (name, details) must be provided"
+                    - "URL parameter 'note_id' must be a positive integer."
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '403':
+          $ref: "#/components/responses/Forbidden"
+        '404':
+          $ref: '#/components/responses/ToDoListNoteNotFound'
+    delete:
+      security:
+        - bearerAuth: []
+      tags:
+        - Notes
+      summary: Delete a specific to-do list note
+      description: 
+        Delete a specific to-do list note. USER roles may delete notes for their own lists. 
+        ADMIN roles may delete notes from any list.
+      parameters:
+        - $ref: '#/components/parameters/NoteId'
+      responses:
+        '204':
+          description: List deleted successfully
+        '400':
+          $ref: '#/components/responses/InvalidNoteId'
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '403':
+          $ref: "#/components/responses/Forbidden"
+        '404':
+          $ref: '#/components/responses/ToDoListNoteNotFound'
+
 # User Account Endpoints
   /users:
     get:
@@ -753,13 +933,35 @@ components:
           type: integer
           readOnly: true
           example: 1
-        title:
+        name:
           type: string
-          example: "To-Do List 1"
+          example: "To-Do List Item 1"
         details:
           type: string
           optional: true
-          example: "Additional information about To-Do List 1"
+          example: "Additional information about To-Do List Item 1."
+        listId:
+          type: integer
+          example: 1
+        createdAt:
+          type: string
+          readOnly: true
+          example: "2026-04-25T22:01:26.110Z"
+
+    ToDoListNote:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+          example: 1
+        name:
+          type: string
+          example: "To-Do List Note 1"
+        content:
+          type: string
+          optional: true
+          example: "Contents of To-Do List Note 1."
         listId:
           type: integer
           example: 1
@@ -972,8 +1174,64 @@ components:
                   - 'The "listId" attribute must be a positive integer'
               badOwnerExample:
                 error:
-                  "Cannot create list: to-do list with id 1 does not exist"
+                  "Cannot create note: to-do list with id 1 does not exist"
 
+# To Do List Note Errors:
+    InvalidNoteId:
+      description: Invalid Note ID
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error: 
+                type: string
+              details:
+                type: array
+                items:
+                  type: string
+            example: 
+              error:
+                "Validation failed"
+              details:
+                - "URL parameter 'note_id' must be a positive integer."
+
+    ToDoListNoteNotFound:
+      description: ToDoListNote not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error: 
+                type: string
+            example: 
+              error: 'To-Do List Note 1 not found'
+
+    InvalidToDoListNoteInput:
+      description: Bad request due to invalid ToDoListNote data.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error: 
+                type: string
+              details:
+                type: array
+                items:
+                  type: string
+            example: 
+              validationExample:
+                error:
+                  "Validation failed"
+                details:
+                  - 'The "name" field is required'
+                  - 'The "content" field is required'
+                  - 'The "listId" attribute must be a positive integer'
+              badOwnerExample:
+                error:
+                  "Cannot create note: to-do list with id 1 does not exist"
     # User Errors
     UserNotFound:
       description: User not found
