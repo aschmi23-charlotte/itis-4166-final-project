@@ -1,6 +1,6 @@
 openapi: 3.1.0
 info:
-  title: Task API
+  title: To-Do List API
   version: 1.0.0
 
 servers:
