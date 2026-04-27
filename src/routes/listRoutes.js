@@ -87,9 +87,9 @@ router.get(
     paramValidator.loadAssociatedList,
     permissionHandler.authorizeAccess(
         rules.OR(
+            rules.associatedListIsPublic(),
             rules.loggedInUserIsRole("ADMIN"),
-            rules.loggedInUserOwnsAssociatedList(),
-            rules.associatedListIsPublic()
+            rules.loggedInUserOwnsAssociatedList()
         )
     ),
     listItemController.getAllForList,
@@ -102,9 +102,9 @@ router.get(
     paramValidator.loadAssociatedList,
     permissionHandler.authorizeAccess(
         rules.OR(
+            rules.associatedListIsPublic(),
             rules.loggedInUserIsRole("ADMIN"),
-            rules.loggedInUserOwnsAssociatedList(),
-            rules.associatedListIsPublic()
+            rules.loggedInUserOwnsAssociatedList()
         )
     ),
     listNoteController.getAllForList,

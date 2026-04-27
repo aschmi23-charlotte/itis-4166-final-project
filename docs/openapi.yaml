@@ -11,11 +11,13 @@ servers:
 
 tags:
   - name: Lists
-    description: List-related endpoints
+    description: List related endpoints
+  - name: Items
+    description: List Item related endpoints
   - name: Users
-    description: User-related endpoints
+    description: User related endpoints
   - name: Auth
-    description: Authentication-related endpoints
+    description: Authentication related endpoints
   - name: Monitoring
     description: Operational endpoints, such as health checks
 
@@ -117,7 +119,7 @@ paths:
         '400':
           $ref: '#/components/responses/InvalidListId'
         '401':
-          $ref: "#/components/responses/Unauthorized"
+          $ref: "#/components/responses/UnauthorizedResource"
         '403':
           $ref: "#/components/responses/Forbidden"
         '404':
@@ -134,7 +136,7 @@ paths:
       parameters:
         - $ref: '#/components/parameters/ListId'
       requestBody:
-        description: The new 'title' and 'isPublic' attributes for the list.
+        description: The new 'title' and 'isPublic' attributes for the list. Only one is required.
         required: true
         content:
           application/json:
@@ -207,6 +209,7 @@ paths:
         - {}
       tags:
         - Lists
+        - Items
       summary: Get all of the items for a specific to-do list
       description: 
         Retrieves the ToDoLost data for a list. If the list is public, authentication is not required and anyone can access.
@@ -215,18 +218,165 @@ paths:
         - $ref: '#/components/parameters/ListId'
       responses:
         '200':
-          description: All items for the 
+          description: All items for the specified to-do list.
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/ToDoListItem'
+        '400':
+          $ref: '#/components/responses/InvalidListId'
+        '401':
+          $ref: "#/components/responses/UnauthorizedResource"
+        '403':
+          $ref: "#/components/responses/Forbidden"
+        '404':
+          $ref: '#/components/responses/ToDoListNotFound'
+
+# ListItem Endpoints
+  /listitem:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - Items
+      summary: Create a new to-do list item and add it to a to-do list.
+      description: 
+        Create a new to-do list item and adds it to a to-do list. USER roles can only create new items for lists
+        they own. ADMIN roles can create a new to-do list item for any list.
+      requestBody:
+        description:
+          Data for the new to-do list. The attribute 'details' is optional.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ToDoListItem"
+      responses:
+        '201':
+          description: ToDoList successfully created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ToDoListItem"
+        '400':
+          $ref: "#/components/responses/InvalidToDoListItemInput"
         '401':
           $ref: "#/components/responses/Unauthorized"
         '403':
           $ref: "#/components/responses/Forbidden"
 
+  /listitem/{item_id}:
+    get:
+      security:
+        - bearerAuth: []
+        - {}
+      tags:
+        - Items
+      summary: Get a specific to-do list item
+      description: 
+        Retrieves the ToDoLostItem data for a list. If the associated list is public, authentication is not required and anyone
+        can access. Otherwise, USER roles may only access items for private lists they own. ADMIN roles can access items for
+        all lists.
+      parameters:
+        - $ref: '#/components/parameters/ItemId'
+      responses:
+        '200':
+          description: Info for the specified list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ToDoListItem'
+        '400':
+          $ref: '#/components/responses/InvalidItemId'
+        '401':
+          $ref: "#/components/responses/UnauthorizedResource"
+        '403':
+          $ref: "#/components/responses/Forbidden"
+        '404':
+          $ref: '#/components/responses/ToDoListItemNotFound'
+    put:
+      security:
+        - bearerAuth: []
+      tags:
+        - Items
+      summary: Updates a specific to-do list item.
+      description:
+        Updates info for a specific to-do list item. Used to change 'name' and 'details' attributes. 
+        USER roles may only update items for their own lists. ADMIN roles can update any list item.
+      parameters:
+        - $ref: '#/components/parameters/ItemId'
+      requestBody:
+        description: The new 'name' and/or 'details' attributes for the list item. Only one is required.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "To-Do List Item 1"
+                details:
+                  type: string
+                  optional: true
+                  example: "Additional info for item 1"
+      responses:
+        '200':
+          description: The updated list item.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ToDoListItem"
+        '400':
+          description: Invalid Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error: 
+                    type: string
+                  details:
+                    type: array
+                    items:
+                      type: string
+                example: 
+                  error:
+                    "Validation failed"
+                  details:
+                    - "At least one field (name, details) must be provided"
+                    - "URL parameter 'item_id' must be a positive integer."
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '403':
+          $ref: "#/components/responses/Forbidden"
+        '404':
+          $ref: '#/components/responses/ToDoListItemNotFound'
+    delete:
+      security:
+        - bearerAuth: []
+      tags:
+        - Items
+      summary: Delete a specific to-do list item
+      description: 
+        Delete a specific to-do list item. USER roles may delete items for their own lists. 
+        ADMIN roles may delete items from any list.
+      parameters:
+        - $ref: '#/components/parameters/ItemId'
+      responses:
+        '204':
+          description: List deleted successfully
+        '400':
+          $ref: '#/components/responses/InvalidItemId'
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '403':
+          $ref: "#/components/responses/Forbidden"
+        '404':
+          $ref: '#/components/responses/ToDoListItemNotFound'
 # User Account Endpoints
   /users:
     get:
@@ -290,7 +440,7 @@ paths:
       parameters:
         - $ref: '#/components/parameters/UserId'
       requestBody:
-        description: The new email and/or password for the specified user.
+        description: The new email and/or password for the specified user. Only one is required.
         required: true
         content:
           application/json:
@@ -462,7 +612,7 @@ paths:
         '400':
           $ref: '#/components/responses/InvalidUserId'
         '401':
-          $ref: "#/components/responses/UnauthorizedOptional"
+          $ref: "#/components/responses/UnauthorizedMe"
         '404':
           $ref: '#/components/responses/UserNotFound'
 
@@ -637,7 +787,7 @@ components:
       description: 
         The id of a ToDoList.
       schema:
-        type: string
+        type: integer
         example: 1
 
     ItemId:
@@ -647,7 +797,7 @@ components:
       description: 
         The id of a ToDoListItem.
       schema:
-        type: string
+        type: integer
         example: 1
 
     NoteId:
@@ -657,7 +807,7 @@ components:
       description: 
         The id of a ToDoListNote.
       schema:
-        type: string
+        type: integer
         example: 1
 
   responses:
@@ -674,8 +824,8 @@ components:
             example: 
               error: "Not authenticated. Please provide a valid token."
 
-    UnauthorizedOptional:
-      description: Client is not authenticated, and parameter required authentication.
+    UnauthorizedMe:
+      description: Client is not authenticated and parameter value requires authentication.
       content:
         application/json:
           schema:
@@ -685,6 +835,18 @@ components:
                 type: string
             example: 
               error: "Special 'user_id' parameter value 'me' required authentication. Please provide valid token."
+
+    UnauthorizedResource:
+      description: Client is not authenticated, and requested resource requires authentication.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error: 
+                type: string
+            example: 
+              error: "The requested resource requires authentication. Please provide a valid token."
 
     Forbidden:
       description: User does not have sufficient permissions.
@@ -698,9 +860,10 @@ components:
             example: 
               error:
                 - "Forbidden: insufficient permission"
+
     # To Do List Errors:
     InvalidListId:
-      description: Invalid User ID
+      description: Invalid List ID
       content:
         application/json:
           schema:
@@ -755,7 +918,61 @@ components:
                 error:
                   "Cannot create list: user with id 1 does not exist"
 
+# To Do List Item Errors:
+    InvalidItemId:
+      description: Invalid Item ID
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error: 
+                type: string
+              details:
+                type: array
+                items:
+                  type: string
+            example: 
+              error:
+                "Validation failed"
+              details:
+                - "URL parameter 'list_id' must be a positive integer."
 
+    ToDoListItemNotFound:
+      description: ToDoListItem not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error: 
+                type: string
+            example: 
+              error: 'To-Do List Item 1 not found'
+
+    InvalidToDoListItemInput:
+      description: Bad request due to invalid ToDoListItem data.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error: 
+                type: string
+              details:
+                type: array
+                items:
+                  type: string
+            example: 
+              validationExample:
+                error:
+                  "Validation failed"
+                details:
+                  - 'The "name" field is required'
+                  - 'The "listId" attribute must be a positive integer'
+              badOwnerExample:
+                error:
+                  "Cannot create list: to-do list with id 1 does not exist"
 
     # User Errors
     UserNotFound:
@@ -821,8 +1038,6 @@ components:
             example: 
               error: "Email has already been used"
 
-
-              
   securitySchemes:
     bearerAuth:
       type: http

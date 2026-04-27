@@ -177,7 +177,6 @@ export default {
                 if (req.associatedList) {
                     return req.associatedList.isPublic;
                 }
-                
             };
         },
     },
