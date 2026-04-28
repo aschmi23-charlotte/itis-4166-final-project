@@ -318,7 +318,7 @@ paths:
             - Execute. Response should return 200, and the response should be the same.
             - "(Note: to avoid potential login problems later, you may want to revert these changes using another request.)"
           admin_steps:
-            - Execute. Response should return 200.
+            - Click *Try it out*.
             - Set the user_id parameter to the id of any other existing user (ideally, one you're not using for testing).
             - Set the "email" field of the request body to a valid email address not used by another user.
             - Execute. Response should return 200.
@@ -328,6 +328,12 @@ paths:
       test_setup: 
         $ref: "#/macros/test_setup/SetupStoreTokens"
       responses:
+        '200':
+         admin_steps:
+            - Click *Try it out*.
+            - Set the user_id parameter to the id of any other existing user (ideally, one you're not using for testing).
+            - If the selected user has the USER role, set the "role" field of the request body to "ADMIN". If the selected user has the ADMIN role, set the "role" field of the request body to "USER". 
+            - Execute. Response should return 200.
         '403':
           $ref: "#/macros/responses/ForbiddenAdminOnly"
     delete:
