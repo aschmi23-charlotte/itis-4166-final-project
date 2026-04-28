@@ -234,7 +234,8 @@ paths:
         '403':
           $ref: "#/macros/responses/ForbiddenListNotePublic"
     put:
-      test_setup: []
+      test_setup: 
+        $ref: "#/macros/test_setup/SetupStoreTokens"
       responses:
         '200':
           test_steps:
@@ -256,13 +257,25 @@ paths:
         '403':
           $ref: "#/macros/responses/ForbiddenListNote"
     delete:
-      test_setup: []
+      test_setup: 
+        $ref: "#/macros/test_setup/SetupStoreTokens"
       responses:
+        '204':
+          test_steps:
+            - Paste your JWT with the USER role into SwaggerUI's *Authorize* window.
+            - Set the item_id parameter to the id of an item where the associated list is owned of the logged in user.
+            - Execute. Response should return 204.
+            - Paste your JWT with the ADMIN role into SwaggerUI's *Authorize* window.
+            - Set the item_id parameter to the id of an item where the associated list is not owned of the logged in user.
+            - Execute. Response should return 204.
         '403':
           $ref: "#/macros/responses/ForbiddenListNote"
   /users:
     get:
-      test_setup: []
+      test_setup: 
+        $ref: "#/macros/test_setup/SetupStoreTokens"
+      responses:
+        '200': {}
   /users/{user_id}:
     get:
       test_setup: []
