@@ -7,10 +7,6 @@ This is purely a tool to leverage what I'm good at (coding) to save me frustrati
 
 The plan is to generate the test plan as a Markdown file, and then use Pandoc (https://pandoc.org/) to generate the final PDF.
 If formatting is an issue, I may consider converting the Markdown to HTML first using appropriate JS libraries first.
-
-Ordinarily, I'd be more comfortable doing this kind of text generation in Python, but it's probably better to not use adding
-Python code to this repo to avoid grading confusion. Don't want to give the impression that I used Python for things that are
-supposed to be JS. That being said, I'll comment everything thoroughly for anyone wondering what I'm doing.
 */
 
 import cproc from "node:child_process";
@@ -42,10 +38,20 @@ const md_header = `
 
 ## API Endpoint Test Plan
 
+### Preamble
+
+Throughout this API, you'll need to authenticate with both a user with the role USER and a user with the role ADMIN.
+As you may need to switch accounts frequently, it is recommended that you acquire JWT tokens for both accounts now,
+and store them somewhere you can easily access, like a text file.
+
+Recommended credentials for ADMIN role: \`{"email": "admin1@example.com", "password": "prod_secret_admin"}\`.
+Recommended credentials for USER role: \`{"email": "user1@example.com", "password": "prod_secret_user"}\`.
+
+### Tests
+
 `;
 
 md_output += md_header;
-
 
 const specs_base = yaml.load(fs.readFileSync(yaml_path, 'utf8'));
 const test_overlay = yaml.load(fs.readFileSync(yaml_overlay_path, 'utf8'));
@@ -65,7 +71,6 @@ for (let path in specs['paths']) {
         let endpoint_info = endpoints[endpoint];
 
         md_output += `* ${endpoint.toUpperCase()} ${path}\n`;
-
 
         let access_control = endpoint_info["access_control"];
         md_output += `  * Access Control: ${access_control}\n`;

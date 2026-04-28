@@ -3,24 +3,25 @@ test_data: {}
 paths:
   /list:
     post:
-      access_control: Authenticated users only. ADMIN roles can create lists for users other than themselves.
+      access_control: 
+        Authenticated users only. ADMIN roles can create lists for users other than themselves.
       test_setup: 
         $ref: "#/macros/test_setup/SetupStoreTokens"
       responses:
         '201':
           test_steps:
-            - Paste the JWT for the USER role into SwaggerUI's *Authorize* window.
+            - Paste your JWT with the USER role into SwaggerUI's *Authorize* window.
             - Click *Try it out*.
             - Remove the ownerId field from the request JSON.
             - Execute. Response should return 200. Response fields should match request body.
-            - Paste the JWT for the ADMIN role into SwaggerUI's *Authorize* window.
+            - Paste your JWT with the ADMIN role into SwaggerUI's *Authorize* window.
             - Set the ownerId field to the ID of a different user than the one logged in.
             - Execute. Response should return 200. Response fields should match request body.
         '403':
           # Replacing a component response. Description required.
           description: User does not have sufficient permissions.
           test_steps:
-            - Paste the JWT for the USER role into SwaggerUI's *Authorize* window.
+            - Paste your JWT with the USER role into SwaggerUI's *Authorize* window.
             - Click *Try it out*.
             - Set the ownerId field to the ID of a different user than the one logged in.
             - Execute. Response should return 403.
@@ -28,7 +29,7 @@ paths:
     get:
       access_control: ADMIN roles only.
       test_setup: 
-        - Use the '/login' endpoint to get a JWT for a user with the ADMIN role. Paste it into SwaggerUI's *Authorize* window.
+        $ref: "#/macros/test_setup/SetupStoreTokens"
       responses:
         '200':
           test_steps:
@@ -38,14 +39,15 @@ paths:
           # Replacing a component response. Description required.
           description: User does not have sufficient permissions.
           test_steps:
-            - Paste the JWT for the USER role into SwaggerUI's *Authorize* window.
+            - Paste your JWT with the USER role into SwaggerUI's *Authorize* window.
             - Click *Try it out*.
             - Execute. Response should return 403.
 
 
   /list/public:
     get:
-      access_control: Anyone can access. Authentication not required. Should never fail outside of status code 500.
+      access_control: 
+        Anyone can access. authentication not required. Should never fail outside of status code 500.
       test_setup: 
         - Delete any JWT from SwaggerUI's *Authorize* window.
       responses:
@@ -56,74 +58,180 @@ paths:
 
   /list/{list_id}:
     get:
-      access_control: If the list is public, anyone can access and Authentication not required. If not, only the owner and ADMIN roles can access.
+      access_control: 
+        If the list is public, anyone can access and authentication not required. If not, only the owner and ADMIN roles can access.
       test_setup:
+        $ref: "#/macros/test_setup/SetupStoreTokens"
+      responses:
+        '200':
+          test_steps:
+            $ref: "#/macros/test_steps/ListGetSuccess"
+        '401':
+          $ref: "#/macros/responses/ListRequiresAuthentication"
+        '403':
+          $ref: "#/macros/responses/ForbiddenListPublic"
+    put:
+      access_control: Only the owner and ADMIN roles can access.
+      test_setup:
+        $ref: "#/macros/test_setup/SetupStoreTokens"
+      responses:
+        '200':
+          test_steps:
+            - Paste your JWT with the USER role into SwaggerUI's *Authorize* window.
+            - Click *Try it out*.
+            - Set the list_id parameter to an id of a list the user owns.
+            - Execute. Response should return 200.
+            - Paste your JWT with the ADMIN role into SwaggerUI's *Authorize* window.
+            - Set the list_id parameter to an id of a list the user does not own.
+            - Execute. Response should return 200. Response fields should match request body.
+        '400':
+          test_steps:
+            - Paste your JWT with the ADMIN role into SwaggerUI's *Authorize* window.
+            - Click *Try it out*.
+            - Use a negative number as the list_id.
+            - Execute. Response should return 400.
+            - Set list_id to an existing list.
+            - Remove all fields from the response body.
+            - Execute. Response should return 400.
+        '403':
+          $ref: "#/macros/responses/ForbiddenList"
+    delete:
+      access_control: Only the owner and ADMIN roles can access.
+      test_setup:
+        $ref: "#/macros/test_setup/SetupStoreTokens"
+      responses:
+        '204':
+          test_steps:
+            - Paste your JWT with the USER role into SwaggerUI's *Authorize* window.
+            - Click *Try it out*.
+            - Set the list_id parameter to an id of a list the user owns.
+            - Execute. Response should return 204.
+            - Paste your JWT with the ADMIN role into SwaggerUI's *Authorize* window.
+            - Set the list_id parameter to an id of a list the user does not own.
+            - Execute. Response should return 204.
+        '403':
+          $ref: "#/macros/responses/ForbiddenList"
+  /list/{list_id}/items:
+    get:
+      access_control: 
+        If the list is public, anyone can access and authentication not required. If not, only the owner and ADMIN roles can access.
+      test_setup:
+        $ref: "#/macros/test_setup/SetupStoreTokens"
+      responses:
+        '200':
+          test_steps:
+            $ref: "#/macros/test_steps/ListGetSuccess"
+        '401':
+          $ref: "#/macros/responses/ListRequiresAuthentication"
+        '403':
+          $ref: "#/macros/responses/ForbiddenListPublic"
+  /list/{list_id}/notes:
+    get:
+      access_control: 
+        If the list is public, anyone can access and authentication not required. If not, only the owner and ADMIN roles can access.
+      test_setup:
+        $ref: "#/macros/test_setup/SetupStoreTokens"
+      responses:
+        '200':
+          test_steps:
+            $ref: "#/macros/test_steps/ListGetSuccess"
+        '401':
+          $ref: "#/macros/responses/ListRequiresAuthentication"
+        '403':
+          $ref: "#/macros/responses/ForbiddenListPublic"
+  /listitem:
+    post:
+      access_control: 
+        If the list indicated by listId is public, anyone can access and authentication not required. If not, only the owner and ADMIN roles can access.
+      test_setup: 
+        $ref: "#/macros/test_setup/SetupStoreTokens"
+      responses:
+        '201':
+          test_steps:
+            $ref: "#/macros/test_steps/ListMemberPostSuccess"
+        '403':
+          $ref: "#/macros/responses/ForbiddenListMemberPost"
+  /listitem/{item_id}:
+    get:
+      access_control:
+        If the list associated with the item is public, anyone can access and authentication not required. If not, only the owner and ADMIN roles can access.
+      test_setup: 
         $ref: "#/macros/test_setup/SetupStoreTokens"
       responses:
         '200':
           test_steps:
             - Remove the JWT in SwaggerUI.
             - Click *Try it out*.
-            - Ensure the list_id parameter is set to the id of public list.
+            - Set the item_id parameter to the id of an item where the associated list is public.
             - Execute. Response should return 200.
-            - Paste the JWT for the ADMIN role into SwaggerUI's *Authorize* window.
-            - Ensure the list_id parameter is set to the id of private list.
-            - Execute. Response should return 200. Response fields should match request body.
+            - Paste your JWT with the USER role into SwaggerUI's *Authorize* window.
+            - Set the item_id parameter to the id of a, item where the associated list is private and owned of the logged in user.
+            - Execute. Response should return 200.
+            - Paste your JWT with the ADMIN role into SwaggerUI's *Authorize* window.
+            - Set the item_id parameter to the id of an item where the associated list is private and not owned of the logged in user.
+            - Execute. Response should return 200.
         '401':
           description: Client is not authenticated, and requested resource requires authentication.
           test_steps:
             - Remove the JWT in SwaggerUI.
             - Click *Try it out*.
-            - Ensure the list_id parameter is set to the id of private list.
+            - Set the item_id parameter to the id item where the listId points to a private list.
             - Execute. Response should return 401.
-        '403':
-          $ref: "#/macros/responses/ForbiddenListPublic"
-    put:
-      test_setup:
-        $ref: "#/macros/test_setup/SetupStoreTokens"
-      responses:
-        '403':
-          $ref: "#/macros/responses/ForbiddenList"
-    delete:
-      test_setup:
-        $ref: "#/macros/test_setup/SetupStoreTokens"
-      responses:
-        '403':
-          $ref: "#/macros/responses/ForbiddenList"
-  /list/{list_id}/items:
-    get:
-      test_setup: []
-      responses:
-        '403':
-          $ref: "#/macros/responses/ForbiddenListPublic"
-  /list/{list_id}/notes:
-    get:
-      test_setup: []
-      responses:
-        '403':
-          $ref: "#/macros/responses/ForbiddenListPublic"
-  /listitem:
-    post:
-      test_setup: []
-  /listitem/{item_id}:
-    get:
-      test_setup: []
-      responses:
         '403':
           $ref: "#/macros/responses/ForbiddenListItemPublic"
     put:
-      test_setup: []
+      access_control:
+        Only the owner of the the item's listID and admin roles can access.
+      test_setup: 
+        $ref: "#/macros/test_setup/SetupStoreTokens"
       responses:
+        '200':
+          test_steps:
+            - Paste your JWT with the USER role into SwaggerUI's *Authorize* window.
+            - Set the item_id parameter to the id of an item where the associated list is owned of the logged in user.
+            - Execute. Response should return 200.
+            - Paste your JWT with the ADMIN role into SwaggerUI's *Authorize* window.
+            - Set the item_id parameter to the id of an item where the associated list is not owned of the logged in user.
+            - Execute. Response should return 200.
+        '400':
+          test_steps:
+            - Paste your JWT with the ADMIN role into SwaggerUI's *Authorize* window.
+            - Click *Try it out*.
+            - Use a negative number as the item_id.
+            - Execute. Response should return 400.
+            - Set item_id to an existing item.
+            - Remove all fields from the response body.
+            - Execute. Response should return 400.
         '403':
           $ref: "#/macros/responses/ForbiddenListItem"
     delete:
-      test_setup: []
+      access_control:
+        Only the owner of the the item's listID and admin roles can access.
+      test_setup: 
+        $ref: "#/macros/test_setup/SetupStoreTokens"
       responses:
+        '204':
+          test_steps:
+            - Paste your JWT with the USER role into SwaggerUI's *Authorize* window.
+            - Set the item_id parameter to the id of an item where the associated list is owned of the logged in user.
+            - Execute. Response should return 204.
+            - Paste your JWT with the ADMIN role into SwaggerUI's *Authorize* window.
+            - Set the item_id parameter to the id of an item where the associated list is not owned of the logged in user.
+            - Execute. Response should return 204.
         '403':
           $ref: "#/macros/responses/ForbiddenListItem"
   /listnote:
     post:
-      test_setup: []
+      access_control: 
+        If the list indicated by listId is public, anyone can access and authentication not required. If not, only the owner and ADMIN roles can access.
+      test_setup: 
+        $ref: "#/macros/test_setup/SetupStoreTokens"
+      responses:
+        '201':
+          test_steps:
+            $ref: "#/macros/test_steps/ListMemberPostSuccess"
+        '403':
+          $ref: "#/macros/responses/ForbiddenListMemberPost"
   /listnote/{note_id}:
     get:
       test_setup: []
@@ -197,20 +305,21 @@ components:
     # To Do List Errors:
     InvalidListId:
       test_steps: 
+        - Paste your JWT with the ADMIN role into SwaggerUI's *Authorize* window.
         - Click *Try it out*.
         - Use a negative number as the list_id.
         - Execute. Response should return 401.
 
     ToDoListNotFound:
       test_steps: 
-        - Paste the JWT for the ADMIN role into SwaggerUI's *Authorize' window.
+        - Paste your JWT with the ADMIN role into SwaggerUI's *Authorize* window.
         - Click *Try it out*.
         - Set list_id to some valid id that does not exist (for example, 99999).
         - Execute. Response should return 404.
 
     InvalidToDoListInput:
       test_steps:
-          - Paste the JWT for the ADMIN role into SwaggerUI's *Authorize' window.
+          - Paste your JWT with the ADMIN role into SwaggerUI's *Authorize* window.
           - Click *Try it out*.
           - Remove the 'title' field from the request body.
           - Execute. Response should return 400.
@@ -218,20 +327,21 @@ components:
     # To Do List Item Errors:
     InvalidItemId:
       test_steps: 
+        - Paste your JWT with the ADMIN role into SwaggerUI's *Authorize* window.
         - Click *Try it out*.
         - Use a negative number as the item_id.
         - Execute. Response should return 401.
 
     ToDoListItemNotFound:
       test_steps:
-        - Paste the JWT for the ADMIN role into SwaggerUI's *Authorize' window.
+        - Paste your JWT with the ADMIN role into SwaggerUI's *Authorize* window.
         - Click *Try it out*.
         - Set item_id to some valid id that does not exist (for example, 99999).
         - Execute. Response should return 404.
 
     InvalidToDoListItemInput:
       test_steps:
-          - Paste the JWT for the ADMIN role into SwaggerUI's *Authorize' window.
+          - Paste your JWT with the ADMIN role into SwaggerUI's *Authorize* window.
           - Click *Try it out*.
           - Remove the 'name' field from the request body.
           - Execute. Response should return 400.
@@ -239,19 +349,20 @@ components:
 # To Do List Note Errors:
     InvalidNoteId:
       test_steps: 
+        - Paste your JWT with the ADMIN role into SwaggerUI's *Authorize* window.
         - Click *Try it out*.
         - Use a negative number as the note_id.
         - Execute. Response should return 401.
     ToDoListNoteNotFound:
       test_steps:
-        - Paste the JWT for the ADMIN role into SwaggerUI's *Authorize' window.
+        - Paste your JWT with the ADMIN role into SwaggerUI's *Authorize* window.
         - Click *Try it out*.
         - Set note_id to some valid id that does not exist (for example, 99999).
         - Execute. Response should return 404.
 
     InvalidToDoListNoteInput:
       test_steps:          
-          - Paste the JWT for the ADMIN role into SwaggerUI's *Authorize' window.
+          - Paste your JWT with the ADMIN role into SwaggerUI's *Authorize* window.
           - Click *Try it out*.
           - Remove the 'name' field from the request body.
           - Execute. Response should return 400.
@@ -259,14 +370,14 @@ components:
     # User Errors
     UserNotFound:
       test_steps:
-        - Paste the JWT for the ADMIN role into SwaggerUI's *Authorize' window.
+        - Paste your JWT with the ADMIN role into SwaggerUI's *Authorize* window.
         - Click *Try it out*.
         - Set user_id to some valid id that does not exist (for example, 99999).
         - Execute. Response should return 404.
 
     InvalidUserId:
       test_steps: 
-        - Paste the JWT for a user with appropriate permissions role into SwaggerUI's *Authorize' window.
+        - Paste your JWT with a user with appropriate permissions role into SwaggerUI's *Authorize* window.
         - Click *Try it out*.
         - set the "email" field of the request body to the email address of another user.
         - Execute. Response should return 401.
@@ -279,7 +390,7 @@ components:
     
     DuplicateEmail:
       test_steps: 
-        - Paste the JWT for a user with appropriate permissions into SwaggerUI's *Authorize' window.
+        - Paste your JWT with a user with appropriate permissions into SwaggerUI's *Authorize* window.
         - Click *Try it out*.
         - Set the "email" field of the request body to the email address of another user.
         - Execute. Response should return 401.
@@ -289,28 +400,64 @@ macros:
     SetupStoreTokens:
       - Use the '/login' endpoint to get a JWT for a user with the ADMIN role. Store it.
       - Use the '/login' endpoint to get a JWT for a user with the USER role. Store it.
-  test_steps: {}
+
+  test_steps: 
+    EmptyRequestBody:
+      - Paste your JWT with the USER role into SwaggerUI's *Authorize* window.
+      - Click *Try it out*.
+      - Remove all fields from the response body.
+      - Execute. Response should return 400.
+
+    ListMemberPostSuccess:
+      - Paste your JWT with the USER role into SwaggerUI's *Authorize* window.
+      - Click *Try it out*.
+      - Set the listId field of the request body to the id of a list owned of the logged in user.
+      - Execute. Response should return 201. Response fields should match request.
+      - Paste your JWT with the ADMIN role into SwaggerUI's *Authorize* window.
+      - Set the listId field of the request body to the id of a list not owned of the logged in user.
+      - Execute. Response should return 201. Response fields should match request.
+
+    ListGetSuccess:
+      - Remove the JWT in SwaggerUI.
+      - Click *Try it out*.
+      - Set the list_id parameter to the id of public list.
+      - Execute. Response should return 200.
+      - Paste your JWT with the USER role into SwaggerUI's *Authorize* window.
+      - Set the list_id parameter to the id of a private list owned by the user.
+      - Execute. Response should return 200. Response data should be populated.
+      - Paste your JWT with the ADMIN role into SwaggerUI's *Authorize* window.
+      - Set the list_id parameter to the id of a private list not owned by the user.
+      - Execute. Response should return 200. Response data should be populated.
+
   responses: 
+    ListRequiresAuthentication:
+      description: Client is not authenticated, and requested resource requires authentication.
+      test_steps:
+        - Remove the JWT in SwaggerUI.
+        - Click *Try it out*.
+        - Set the list_id parameter to the id of private list.
+        - Execute. Response should return 401.
+
     ForbiddenListPublic:
       description: User does not have sufficient permissions.
       test_steps:
-        - Paste the JWT for the USER role into SwaggerUI's *Authorize* window.
+        - Paste your JWT with the USER role into SwaggerUI's *Authorize* window.
         - Click *Try it out*.
-        - Ensure the list_id parameter is set to the id of a private list not owned by the user.
+        - Set the list_id parameter to the id of a private list not owned by the user.
         - Execute. Response should return 403.
 
     ForbiddenList:
       description: User does not have sufficient permissions.
       test_steps:
-        - Paste the JWT for the USER role into SwaggerUI's *Authorize* window.
+        - Paste your JWT with the USER role into SwaggerUI's *Authorize* window.
         - Click *Try it out*.
-        - Ensure the list_id parameter is set to the id of any list not owned by the user.
+        - Set the list_id parameter to the id of any list not owned by the user.
         - Execute. Response should return 403.
 
     ForbiddenListItemPublic:
       description: User does not have sufficient permissions.
       test_steps:
-        - Paste the JWT for the USER role into SwaggerUI's *Authorize* window.
+        - Paste your JWT with the USER role into SwaggerUI's *Authorize* window.
         - Click *Try it out*.
         - Ensure the item_id parameter is set to an item where the associated list is a private and not owned by the user.
         - Execute. Response should return 403.
@@ -318,7 +465,7 @@ macros:
     ForbiddenListItem:
       description: User does not have sufficient permissions.
       test_steps:
-        - Paste the JWT for the USER role into SwaggerUI's *Authorize* window.
+        - Paste your JWT with the USER role into SwaggerUI's *Authorize* window.
         - Click *Try it out*.
         - Ensure the item_id parameter is set to an item where the associated list not owned by the user.
         - Execute. Response should return 403.
@@ -326,16 +473,23 @@ macros:
     ForbiddenListNotePublic:
       description: User does not have sufficient permissions.
       test_steps:
-        - Paste the JWT for the USER role into SwaggerUI's *Authorize* window.
+        - Paste your JWT with the USER role into SwaggerUI's *Authorize* window.
         - Click *Try it out*.
-        - Ensure the list_id parameter is set to a note where the associated list is a private and not owned by the user.
+        - Set the list_id parameter to a note where the associated list is a private and not owned by the user.
         - Execute. Response should return 403.
 
     ForbiddenListNote:
       description: User does not have sufficient permissions.
       test_steps:
-        - Paste the JWT for the USER role into SwaggerUI's *Authorize* window.
+        - Paste your JWT with the USER role into SwaggerUI's *Authorize* window.
         - Click *Try it out*.
         - Ensure the note_id parameter is set to a note where the associated list not owned by the user.
         - Execute. Response should return 403.
 
+
+    ForbiddenListMemberPost:
+          description: User does not have sufficient permissions.
+          test_steps:
+              - Paste your JWT with the USER role into SwaggerUI's *Authorize* window.
+              - Set the listId field of the request body to the id of a list not owned of the logged in user.
+              - Execute. Response should return 201. Response fields should match request.
