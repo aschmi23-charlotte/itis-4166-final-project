@@ -72,8 +72,11 @@ for (let path in specs['paths']) {
 
         md_output += `* ${endpoint.toUpperCase()} ${path}\n`;
 
-        let access_control = endpoint_info["access_control"];
-        md_output += `  * Access Control: ${access_control}\n`;
+        // let access_control = endpoint_info["access_control"];
+        // md_output += `  * Access Control: ${access_control}\n`;
+
+        let description = endpoint_info["description"];
+        md_output += `  * Description: ${description}\n`;
 
         md_output += `  * Test Setup:\n`;
         if (endpoint_info["test_setup"] !== undefined) {

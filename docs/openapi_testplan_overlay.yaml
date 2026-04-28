@@ -1,8 +1,6 @@
 paths:
   /list:
     post:
-      access_control: 
-        Authenticated users only. ADMIN roles can create lists for users other than themselves.
       test_setup: 
         $ref: "#/macros/test_setup/SetupStoreTokens"
       responses:
@@ -25,7 +23,6 @@ paths:
             - Execute. Response should return 403.
   /list/all:
     get:
-      access_control: ADMIN roles only.
       test_setup: 
         $ref: "#/macros/test_setup/SetupStoreTokens"
       responses:
@@ -44,8 +41,6 @@ paths:
 
   /list/public:
     get:
-      access_control: 
-        Anyone can access. authentication not required. Should never fail outside of status code 500.
       test_setup: 
         - Delete any JWT from SwaggerUI's *Authorize* window.
       responses:
@@ -56,8 +51,6 @@ paths:
 
   /list/{list_id}:
     get:
-      access_control: 
-        If the list is public, anyone can access and authentication not required. If not, only the owner and ADMIN roles can access.
       test_setup:
         $ref: "#/macros/test_setup/SetupStoreTokens"
       responses:
@@ -69,7 +62,6 @@ paths:
         '403':
           $ref: "#/macros/responses/ForbiddenListPublic"
     put:
-      access_control: Only the owner and ADMIN roles can access.
       test_setup:
         $ref: "#/macros/test_setup/SetupStoreTokens"
       responses:
@@ -94,7 +86,6 @@ paths:
         '403':
           $ref: "#/macros/responses/ForbiddenList"
     delete:
-      access_control: Only the owner and ADMIN roles can access.
       test_setup:
         $ref: "#/macros/test_setup/SetupStoreTokens"
       responses:
@@ -111,8 +102,6 @@ paths:
           $ref: "#/macros/responses/ForbiddenList"
   /list/{list_id}/items:
     get:
-      access_control: 
-        If the list is public, anyone can access and authentication not required. If not, only the owner and ADMIN roles can access.
       test_setup:
         $ref: "#/macros/test_setup/SetupStoreTokens"
       responses:
@@ -125,8 +114,6 @@ paths:
           $ref: "#/macros/responses/ForbiddenListPublic"
   /list/{list_id}/notes:
     get:
-      access_control: 
-        If the list is public, anyone can access and authentication not required. If not, only the owner and ADMIN roles can access.
       test_setup:
         $ref: "#/macros/test_setup/SetupStoreTokens"
       responses:
@@ -139,8 +126,6 @@ paths:
           $ref: "#/macros/responses/ForbiddenListPublic"
   /listitem:
     post:
-      access_control:
-        Only the owner of the the new item's listId and admin roles can access.
       test_setup: 
         $ref: "#/macros/test_setup/SetupStoreTokens"
       responses:
@@ -151,8 +136,6 @@ paths:
           $ref: "#/macros/responses/ForbiddenListMemberPost"
   /listitem/{item_id}:
     get:
-      access_control:
-        If the list associated with the item is public, anyone can access and authentication not required. If not, only the owner and ADMIN roles can access.
       test_setup: 
         $ref: "#/macros/test_setup/SetupStoreTokens"
       responses:
@@ -178,8 +161,6 @@ paths:
         '403':
           $ref: "#/macros/responses/ForbiddenListItemPublic"
     put:
-      access_control:
-        Only the owner of the the item's listID and admin roles can access.
       test_setup: 
         $ref: "#/macros/test_setup/SetupStoreTokens"
       responses:
@@ -203,8 +184,6 @@ paths:
         '403':
           $ref: "#/macros/responses/ForbiddenListItem"
     delete:
-      access_control:
-        Only the owner of the the item's listID and admin roles can access.
       test_setup: 
         $ref: "#/macros/test_setup/SetupStoreTokens"
       responses:
@@ -220,8 +199,6 @@ paths:
           $ref: "#/macros/responses/ForbiddenListItem"
   /listnote:
     post:
-      access_control:
-        Only the owner of the the note's listID and admin roles can access.
       test_setup: 
         $ref: "#/macros/test_setup/SetupStoreTokens"
       responses:
@@ -232,8 +209,6 @@ paths:
           $ref: "#/macros/responses/ForbiddenListMemberPost"
   /listnote/{note_id}:
     get:
-      access_control: 
-        If the list indicated by listId is public, anyone can access and authentication not required. If not, only the owner and ADMIN roles can access.
       test_setup: 
         $ref: "#/macros/test_setup/SetupStoreTokens"
       responses:
