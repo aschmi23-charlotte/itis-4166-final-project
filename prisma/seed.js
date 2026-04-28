@@ -62,9 +62,12 @@ async function seed_all() {
     const new_users = [
         { email: "admin1@example.com", password: await prepare_pwd(SEED_PASSWORD_ADMIN), role: "ADMIN" },
         { email: "admin2@example.com", password: await prepare_pwd(SEED_PASSWORD_ADMIN), role: "ADMIN" },
+        { email: "admin3@example.com", password: await prepare_pwd(SEED_PASSWORD_ADMIN), role: "ADMIN" },
         { email: "user1@example.com", password: await prepare_pwd(SEED_PASSWORD_USER), role: "USER" },
         { email: "user2@example.com", password: await prepare_pwd(SEED_PASSWORD_USER), role: "USER" },
         { email: "user3@example.com", password: await prepare_pwd(SEED_PASSWORD_USER), role: "USER" },
+        { email: "user4@example.com", password: await prepare_pwd(SEED_PASSWORD_USER), role: "USER" },
+        { email: "user5@example.com", password: await prepare_pwd(SEED_PASSWORD_USER), role: "USER" },
     ];
     await seed_table("user", prisma.user, new_users);
 
@@ -76,6 +79,8 @@ async function seed_all() {
         // which is helpful for writing seed code.
         new_lists.push({ title: `To-Do List ${++list_count}`, isPublic: false, ownerId: await getUserIdFromEmail(new_users[i].email) });
         new_lists.push({ title: `To-Do List ${++list_count}`, isPublic: true, ownerId: await getUserIdFromEmail(new_users[i].email) });
+        // new_lists.push({ title: `To-Do List ${++list_count}`, isPublic: false, ownerId: await getUserIdFromEmail(new_users[i].email) });
+        // new_lists.push({ title: `To-Do List ${++list_count}`, isPublic: true, ownerId: await getUserIdFromEmail(new_users[i].email) });
     }
     await seed_table("todolist", prisma.toDoList, new_lists);
     
@@ -85,6 +90,8 @@ async function seed_all() {
     for (let i = 0; i < new_lists.length; i++) {
         new_listitems.push({ name: `Perform Item ${++listitem_count}`, details: null, listId: await geListIdFromTitle(new_lists[i].title) });
         new_listitems.push({ name: `Perform Item ${++listitem_count}`, details: `Item ${listitem_count} details specified here.`, listId: await geListIdFromTitle(new_lists[i].title) });
+        // new_listitems.push({ name: `Perform Item ${++listitem_count}`, details: null, listId: await geListIdFromTitle(new_lists[i].title) });
+        // new_listitems.push({ name: `Perform Item ${++listitem_count}`, details: `Item ${listitem_count} details specified here.`, listId: await geListIdFromTitle(new_lists[i].title) });
     }
     await seed_table("todolistitem", prisma.toDoListItem, new_listitems);
 
@@ -92,6 +99,7 @@ async function seed_all() {
     const new_listnotes = [];
     let listnote_count = 0;
     for (let i = 0; i < new_lists.length; i++) {
+        new_listnotes.push({ name: `Note ${++listnote_count}`, content: `Note ${listnote_count} content goes here.`, listId: await geListIdFromTitle(new_lists[i].title) });
         new_listnotes.push({ name: `Note ${++listnote_count}`, content: `Note ${listnote_count} content goes here.`, listId: await geListIdFromTitle(new_lists[i].title) });
     }
     await seed_table("todolistnote", prisma.toDoListNote, new_listnotes);

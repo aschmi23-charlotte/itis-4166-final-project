@@ -37,13 +37,13 @@ const assemble_document_text = async (seed_data, test_list) => `
 * API URL: [https://itis-4166-final-project-au83.onrender.com/api](https://itis-4166-final-project-au83.onrender.com/api)
 * API Documentation: [https://itis-4166-final-project-au83.onrender.com/api-doc](https://itis-4166-final-project-au83.onrender.com/api-doc)
 
-## API Endpoint Test Plan
+## Read Before Testing - General API Information
 
 ### Preamble
 
 Throughout this API, you'll need to authenticate with both a user with the role USER and a user with the role ADMIN.
 As you may need to switch accounts frequently, it is recommended that you acquire JWT tokens for both accounts now,
-and store them somewhere you can easily access and paste from, like a text file. To reduce instances of needing to 
+and store them somewhere you can easily access and paste from, like a text file. To reduce instances of needing to
 reauthenticate, the JWT tokens are set to expire after 24 hours.
 
 Recommended credentials for ADMIN role: \`{"email": "admin1@example.com", "password": "prod_secret_admin"}\`.
@@ -76,7 +76,7 @@ make a GET request for the ToDoListItem with the id 1, the request would not be 
 and owned by a different user. If the ToDoList 1 was made public, User 5 would now be able to make a GET request for ToDoListItem 1, but PUT and DELETE requests
 would still not be permitted since ToDoList 1 is not owned by User 5.
 
-One last thing: Users with the ADMIN role have full access to all application resources, regardless of ownership or privacy status. In the previous example, 
+One last thing: Users with the ADMIN role have full access to all application resources, regardless of ownership or privacy status. In the previous example,
 User 5 has the USER role and therefore the usual authorization logic applies. However, if User 5 was given the ADMIN role, they would be able to make PUT and
 DELETE requests for ToDoListItem 1 regardless of ownership.
 
@@ -86,10 +86,15 @@ The following tables list the initial seeded content of the PostgreSQL as of ass
 
 Note: Since knowing the timestamps stored in the createdAt fields are not beneficial for testing, these have been hidden to conserve space. This is indicated with '...'.
 ${seed_data}
+## API Endpoint Test Plan
+
+### Testing Setup
+
+...
+
 ### Tests
 
-${test_list}
-`;
+${test_list}`;
 
 /**
  * 
@@ -195,13 +200,42 @@ async function assemble_test_plan() {
 
             for (let response in responses) {
                 let response_info = responses[response];
-                retVal += `    * ${response}${response.startsWith('2') ? " (SUCCESS)" : ""} - ${response_info['description']}\n`;
+                retVal += `    * ${response}${response.startsWith('2') ? " (SUCCESS)" : ""} -- ${response_info['description']}\n`;
+
+                // No Auth Steps:
+                if (response_info["no_auth_steps"] !== undefined) {
+                    let no_auth_steps = response_info["no_auth_steps"];
+                    retVal += `      * With No Authentication:\n`;
+
+                    for (let i in no_auth_steps) {
+                        retVal += `        * ${no_auth_steps[i]}\n`;
+                    }
+                }
+
+                if (response_info["user_steps"] !== undefined) {
+                    let user_steps = response_info["user_steps"];
+                    retVal += `      * While USER Role Authenticated:\n`;
+
+                    for (let i in user_steps) {
+                        retVal += `        * ${user_steps[i]}\n`;
+                    }
+                }
+
+                if (response_info["admin_steps"] !== undefined) {
+                    let admin_steps = response_info["admin_steps"];
+                    retVal += `      * While ADMIN Role Authenticated:\n`;
+
+                    for (let i in admin_steps) {
+                        retVal += `        * ${admin_steps[i]}\n`;
+                    }
+                }
 
                 if (response_info["test_steps"] !== undefined) {
-                    let test_steps = response_info["test_steps"];
+                    let special_steps = response_info["test_steps"];
+                    retVal += `      * Special Case:\n`;
 
-                    for (let i in test_steps) {
-                        retVal += `      * ${test_steps[i]}\n`;
+                    for (let i in special_steps) {
+                        retVal += `        * ${special_steps[i]}\n`;
                     }
                 }
             }
