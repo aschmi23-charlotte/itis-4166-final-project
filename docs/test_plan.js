@@ -91,7 +91,7 @@ Since knowing the timestamps stored in the "createdAt" fields are not beneficial
 with '...'.
 
 The same is true of the "password" field of the User table, as passwords are stored as bcrypt hashes and cannot be used to log in directly. All users seeded
-with the ADMIN role have "prod_secret_admin" set as their initial password, and all users with the USER role have "prod_secred_user" set as their initial password.
+with the ADMIN role have "prod_secret_admin" set as their initial password, and all users with the USER role have "prod_secret_user" set as their initial password.
 Both passwords are without quotes.
 
 ${seed_data}
