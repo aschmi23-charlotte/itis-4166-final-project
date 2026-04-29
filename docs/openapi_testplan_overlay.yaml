@@ -569,8 +569,8 @@ components:
 macros:
   test_setup:
     SetupStoreTokens:
-      - Use the '/login' endpoint to get a JWT for a user with the ADMIN role. Store it.
-      - Use the '/login' endpoint to get a JWT for a user with the USER role. Store it.
+      - For USER role testing, authenticate with the JWT for user `user1@example.com`, as discussed in Global Testing Setup.
+      - For ADMIN role testing, authenticate with the JWT for user `admin1@example.com`, as discussed in Global Testing Setup.
 
   step_lists: 
     EmptyRequestBodyUser:

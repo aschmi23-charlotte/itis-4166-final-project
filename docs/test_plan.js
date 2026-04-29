@@ -28,7 +28,7 @@ const md_output_path = "./docs/generated/test_plan.md";
 const yaml_merge_path = "./docs/generated/openapi_merged.yaml";
 const resolved_yaml_path = "./docs/generated/openapi_resolved.yaml";
 
-const assemble_document_text = async (seed_data, test_list) => `
+const assemble_document_text = async (seed_data, test_list, ownership_table_user, ownership_table_admin) => `
 # ITIS-4166 Final Project - Alex Schmid
 
 ## Relevant Links
@@ -39,16 +39,9 @@ const assemble_document_text = async (seed_data, test_list) => `
 
 ## Read Before Testing - General API Information
 
-### Preamble
-
-Throughout this API, you'll need to authenticate with both a user with the role USER and a user with the role ADMIN.
-As you may need to switch accounts frequently, it is recommended that you acquire JWT tokens for both accounts now,
-and store them somewhere you can easily access and paste from, like a text file. To reduce instances of needing to
-reauthenticate, the JWT tokens are set to expire after 24 hours.
-
-Recommended credentials for ADMIN role: \`{"email": "admin1@example.com", "password": "prod_secret_admin"}\`.
-
-Recommended credentials for USER role: \`{"email": "user1@example.com", "password": "prod_secret_user"}\`.
+This API is a To-Do List system. Users can register and create ToDoLists entities (AKA, lists) attached to their account.
+Furthermore, ToDoLists can have ToDoListItems associated with them (think of these as individual bullet points on a conventional to-do list),
+as well as ToDoListNotes associated with them (think of these as blocks of additional information users can store within the lists).
 
 ### Public Vs Private Lists
 
@@ -58,41 +51,78 @@ If "isPublic" is set to true, the list is public. If "isPublic" is set to false,
 The testing section will go into more detail on how public or private status affects authorization, but the general concept is that read-only
 access is provided for public lists, regardless of authentication or other permissions.
 
-### A Word on Ownership and Access Authorization
+### Ownership and Access Authorization
 
 The test plans below make reference to ToDoLists being owned by specific users, and ToDoListItems and ToDoListNotes being owned by specific
 ToDoLists. Let us go over how that works briefly.
 
 A ToDoList entity has an integer attribute called "ownerId". The ToDoList is considered to be owned by the User entity whose "id" attribute
 matches the value of "ownerId". For example, you'll see in the tables below that the ToDoLists with ids 1 and 2 both have an "ownerId" attribute
-of 1, and are therefore owned by the User with the id of 1 (\`admin1@example.com\`). The ToDoLists with ids 3 and 4 are owned by User with the id 2,
-and so on. This is important to understand because authorization to access a ToDoList is governed in part by which User user owns it.
+of 1. This means that these lists are owned by the User with the id of 1 (\`admin1@example.com\`). The ToDoLists with ids 3 and 4 are owned by User with the id 2,
+and so on. This is important to understand because authorization for accessing a ToDoList is governed in part by which User user owns it.
 
 Likewise, ToDoListItems and ToDoListNotes both have attributes called "listId", which functions in a similar way. The ToDoListItem or ToDoListNote
-is considered to be owned by (or rather a part of) the ToDoList entity whose "id" attribute matches the value of "listId". The authorization logic
-for these entities is a bit more complex, however, as access will be in part granted to ToDoListItems and ToDoListNotes based on *properties* of the ToDoList
-corresponding to "listId" (specifically, the "ownerId" and "isPublic" fields). For example, if the User with the id 5 (\`user3@example.com\`) were to
-make a GET request for the ToDoListItem with the id 1, the request would not be authorized; ToDoListItem 1 is owned by ToDoList 1, which is both private
-and owned by a different user. If the ToDoList 1 was made public, User 5 would now be able to make a GET request for ToDoListItem 1, but PUT and DELETE requests
-would still not be permitted since ToDoList 1 is not owned by User 5.
+is considered to be owned by (or rather, a part of) the ToDoList whose "id" attribute matches the value of "listId". The authorization logic
+for these entities is a bit more complex, however. Part of the authorization logic for ToDoListItems and ToDoListNotes looks at the *properties* of the ToDoList
+corresponding to "listId" (specifically, the ToDoList's "ownerId" and "isPublic" fields). A user will have full access to a ToDoListItem or ToDoListNote
+if they owns the associated ToDoList. Additionally, if the list's "isPublic" field is set to true, then users who do not own that list will still have
+read-only access to the ToDoList, and it's associated ToDoListItems and ToDoListNotes.
 
-One last thing: Users with the ADMIN role have full access to all application resources, regardless of ownership or privacy status. In the previous example,
-User 5 has the USER role and therefore the usual authorization logic applies. However, if User 5 was given the ADMIN role, they would be able to make PUT and
-DELETE requests for ToDoListItem 1 regardless of ownership.
+For example, if the User with the id 5 (\`user2@example.com\`) were to make a GET request for the ToDoListItem with the id 1, the request would not be authorized;
+ToDoListItem 1 is owned by ToDoList 1, which is both private and owned by a different user. If the ToDoList 1 was made public, User 5 would now be able to make a
+GET request for ToDoListItem 1, but PUT and DELETE requests would still not be permitted since ToDoList 1 is not owned by User 5.
+
+One last thing: These rules only apply if the user making the request has the USER role. Users with the ADMIN role have full access to all application resources,
+regardless of ownership or privacy status. In the previous example, User 5 has the USER role and therefore the usual authorization logic applies. However, if
+User 5 was given the ADMIN role, they would be able to make PUT and DELETE requests for ToDoListItem 1 regardless of ownership.
 
 ### Seeded Data
 
-The following tables list the initial seeded content of the PostgreSQL as of assignment submission.
+The following tables list the initial seeded content of the PostgreSQL database as of assignment submission.
 
-Note: Since knowing the timestamps stored in the createdAt fields are not beneficial for testing, these have been hidden to conserve space. This is indicated with '...'.
+Since knowing the timestamps stored in the "createdAt" fields are not beneficial for testing, these have been hidden to conserve space. This is indicated
+with '...'.
+
+The same is true of the "password" field of the User table, as passwords are stored as bcrypt hashes and cannot be used to log in directly. All users seeded
+with the ADMIN role have "prod_secret_admin" set as their initial password, and all users with the USER role have "prod_secred_user" set as their initial password.
+Both passwords are without quotes.
+
 ${seed_data}
 ## API Endpoint Test Plan
 
-### Testing Setup
+### Global Testing Setup
 
-...
+Many of the endpoints need to be tested in multiple states of authentication, and the testing steps of each response are grouped based on which state needs to be
+used for a certain set of steps. The three authentication states to consider are:
 
-### Tests
+* No authentication at all (indicated with the with header "With No Authentication").
+* Authenticated as a user with the USER role (indicated with the with header "With USER Role Authentication").
+* Authenticated as a user with the ADMIN role (indicated with the with header "With ADMIN Role Authentication").
+
+It is HIGHLY recommended that you acquire JWT keys for both the USER and ADMIN roles in advance, and store them somewhere easily accessible like a text file.
+This will be much more efficient than having to reacquire a new JWT from the  "/login" endpoint every time you need to switch accounts. To authenticate, simply
+paste the JWT into SwaggerUI's **Authorize** popup and click "Login". To disable authentication, open the popup again and click "Logout".
+
+For USER role, use these credentials. You should be able to paste them directly into the request body of SwaggerUI's *Try it out* feature on the "/login" endpoint:
+ \`{"email": "user1@example.com", "password": "prod_secret_user"}\`.
+
+The information for this user and all of the entities it owns are as follows:
+
+${ownership_table_user}
+For ADMIN role, use these credentials. You should be able to paste them directly into the request body of SwaggerUI's *Try it out* feature on the "/login" endpoint:
+ \`{"email": "admin1@example.com", "password": "prod_secret_admin"}\`.
+
+The information for this user and all of the entities it owns are as follows:
+
+${ownership_table_admin}
+It might be more efficient to run all of the tests for one Authentication state before switching to the next one (IE, running all of the USER tests before
+running ADMIN tests). The fact that the tests are broken up by authentication state makes this easy, and you can use CTRL+F to jump through all of the headers 
+corresponding to an authentication state.
+
+Lastly, some tests specify using the ADMIN JWT when testing behaviors not specific to the ADMIN role. This is simply to help you avoid running into authorization
+errors accidentally, since ADMINs are authorized for everything.
+
+### Endpoint Tests
 
 ${test_list}`;
 
@@ -103,7 +133,7 @@ ${test_list}`;
  * @param {array} hidden_row_names 
  * @param {string} additional_notes 
  */
-async function assemble_seed_table(model, table_name, row_names, hidden_row_names, additional_notes) {
+async function assemble_seed_table(data, table_name, row_names, hidden_row_names) {
     // Handling for if hidden row names wasn't used:
     if (!hidden_row_names) {
         hidden_row_names = [];
@@ -113,11 +143,8 @@ async function assemble_seed_table(model, table_name, row_names, hidden_row_name
     let table_header = "| " + combined_row_names.join(" | ") + " |\n";
     let table_divider = ("| --- ".repeat(combined_row_names.length)) + "|\n";
 
-    let retVal = `\n#### ${table_name}\n\n` + table_header + table_divider;
+    let retVal = `#### ${table_name}\n\n` + table_header + table_divider;
     
-    // Now we get the data.
-    let data = await model.findMany();
-
     for (let i in data) {
         let entry = data[i];
         
@@ -135,29 +162,47 @@ async function assemble_seed_table(model, table_name, row_names, hidden_row_name
             }
             
         }
-        table_row += "|\n";
+        table_row += "|";
         retVal += table_row;
-    }
 
-    if (additional_notes) {
-        retVal += `\n${additional_notes}\n`
+        if (i < data.length) {
+            retVal += "\n";
+        }
     }
 
     return retVal;
 }
 
 async function assemble_all_seed_tables() {
-    let retVal = "";
+    let tables = [];
 
-    retVal += await assemble_seed_table(prisma.user, "User", ["id", "email", "role"], [ "password", "createdAt"], 
-        "* Since knowing the bcrypt hash stored in the password field is not useful for testing, these have been hidden to conserve space. This is indicated with '...'.\n" + 
-        "* All users with the USER role were given an initial password of 'prod_secret_user' (without the quotes)\n" + 
-        "* All users with the ADMIN role were given an initial password of 'prod_secret_admin' (without the quotes)."
-    );
-    retVal += await assemble_seed_table(prisma.toDoList, "ToDoList", ["id", "title", "isPublic", "ownerId"], ["createdAt"]);
-    retVal += await assemble_seed_table(prisma.toDoListItem, "ToDoListItem", ["id", "name", "details", "listId"], ["createdAt"]);
-    retVal += await assemble_seed_table(prisma.toDoListNote, "ToDoListNote", ["id", "name", "content", "listId"], ["createdAt"]);
-    return retVal;
+    tables.push(await assemble_seed_table(await prisma.user.findMany(), "User", ["id", "email", "role"], [ "password", "createdAt"]));
+    tables.push(await assemble_seed_table(await prisma.toDoList.findMany(), "ToDoList", ["id", "title", "isPublic", "ownerId"], ["createdAt"]));
+    tables.push(await assemble_seed_table(await prisma.toDoListItem.findMany(), "ToDoListItem", ["id", "name", "details", "listId"], ["createdAt"]));
+    tables.push(await assemble_seed_table(await prisma.toDoListNote.findMany(), "ToDoListNote", ["id", "name", "content", "listId"], ["createdAt"]));
+    return tables.join("\n");
+}
+
+async function assemble_ownership_tables(user_id) {
+    // Handling for if hidden row names wasn't used:
+    let tables = [];
+
+    // We specifically want this as an array.
+    let users = await prisma.user.findMany({where: {id: user_id}})
+    tables.push(await assemble_seed_table(users, `User info for \`${users[0].email}\` (id ${user_id})`, ["id", "email", "role"], [ "password", "createdAt"]));
+
+    let lists = await prisma.toDoList.findMany({where: {ownerId: user_id}})
+    tables.push(await assemble_seed_table(lists, `ToDoLists owned by user id ${user_id}`, ["id", "title", "isPublic", "ownerId"], ["createdAt"]));
+
+    let list_ids = [];
+    for (let i in lists) {
+        let list = lists[i];
+        list_ids.push(list.id);
+    }
+
+    tables.push(await assemble_seed_table(await prisma.toDoListItem.findMany({where: {listId: {in: list_ids}}}), `ToDoListItems owned by user id ${user_id}`, ["id", "name", "details", "listId"], ["createdAt"]));
+    tables.push(await assemble_seed_table(await prisma.toDoListNote.findMany({where: {listId: {in: list_ids}}}), `ToDoListNotes owned by user id ${user_id}`, ["id", "name", "content", "listId"], ["createdAt"]));
+    return tables.join("\n");
 }
 
 async function assemble_test_plan() {
@@ -214,7 +259,7 @@ async function assemble_test_plan() {
 
                 if (response_info["user_steps"] !== undefined) {
                     let user_steps = response_info["user_steps"];
-                    retVal += `      * While USER Role Authenticated:\n`;
+                    retVal += `      * With USER Role Authentication:\n`;
 
                     for (let i in user_steps) {
                         retVal += `        * ${user_steps[i]}\n`;
@@ -223,7 +268,7 @@ async function assemble_test_plan() {
 
                 if (response_info["admin_steps"] !== undefined) {
                     let admin_steps = response_info["admin_steps"];
-                    retVal += `      * While ADMIN Role Authenticated:\n`;
+                    retVal += `      * With ADMIN Role Authentication:\n`;
 
                     for (let i in admin_steps) {
                         retVal += `        * ${admin_steps[i]}\n`;
@@ -248,7 +293,9 @@ async function assemble_test_plan() {
 async function main() {
     let seed_data = await assemble_all_seed_tables();
     let test_list = await assemble_test_plan();
-    let md_output = await assemble_document_text(seed_data, test_list);
+    let user_owns = await assemble_ownership_tables(4);
+    let admin_owns = await assemble_ownership_tables(1);
+    let md_output = await assemble_document_text(seed_data, test_list, user_owns, admin_owns);
 
     // console.log("================== Output ==================");
     // console.log(md_output);

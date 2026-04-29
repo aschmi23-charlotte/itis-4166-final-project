@@ -105,7 +105,7 @@ paths:
         - Lists
       summary: Get a specific To-Do list
       description: 
-        Retrieves the ToDoLost data for a list. If the list is public, authentication is not required and anyone can access.
+        Retrieves the ToDoList data for a list. If the list is public, authentication is not required and anyone can access.
         Otherwise, USER roles may only access private lists they own. ADMIN roles can access all lists.
       parameters:
         - $ref: '#/components/parameters/ListId'
@@ -246,7 +246,7 @@ paths:
         - Notes
       summary: Get all of the notes for a specific to-do list
       description: 
-        Retrieves the ToDoLost data for a list. If the list is public, authentication is not required and anyone can access.
+        Retrieves the ToDoList data for a list. If the list is public, authentication is not required and anyone can access.
         Otherwise, USER roles may only access private lists they own. ADMIN roles can access all lists.
       parameters:
         - $ref: '#/components/parameters/ListId'
@@ -309,7 +309,7 @@ paths:
         - Items
       summary: Get a specific to-do list item
       description: 
-        Retrieves the ToDoLostItem data for a list. If the associated list is public, authentication is not required and anyone
+        Retrieves the ToDoListItem data for a list. If the associated list is public, authentication is not required and anyone
         can access. Otherwise, USER roles may only access items for private lists they own. ADMIN roles can access items for
         all lists.
       parameters:
@@ -454,7 +454,7 @@ paths:
         - Notes
       summary: Get a specific to-do list note
       description: 
-        Retrieves the ToDoLostNote data for a list. If the associated list is public, authentication is not required and anyone
+        Retrieves the ToDoListNote data for a list. If the associated list is public, authentication is not required and anyone
         can access. Otherwise, USER roles may only access notes for private lists they own. ADMIN roles can access notes for
         all lists.
       parameters:
