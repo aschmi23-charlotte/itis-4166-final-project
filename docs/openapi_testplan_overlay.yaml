@@ -322,24 +322,67 @@ paths:
             - Set the user_id parameter to the id of any other existing user (ideally, one you're not using for testing).
             - Set the "email" field of the request body to a valid email address not used by another user.
             - Execute. Response should return 200.
+        '400':
+          admin_steps:
+            - Click *Try it out*.
+            - Use a negative number as the user_id.
+            - Execute. Response should return 400.
+            - Set user_id to the id for an existing user.
+            - Remove the @ symbol from the email address.
+            - Execute. Response should return 400.
+            - Restore the @ symbol to the email address.
+            - Shorten the password to be less than 8 characters.
+            - Execute. Response should return 400.
+            - Restore the password's length.
+            - Remove all fields from the response body.
+            - Execute. Response should return 400.
+    
         '403':
           $ref: "#/macros/responses/ForbiddenUserId"
+        '409':
+          description: Duplicate Email
+          admin_steps: 
+            - Click *Try it out*.
+            - Set user_id to 'me' (without quotes).
+            - Set the "email" field of the request body to the email address of another user.
+            - Execute. Response should return 401.
     patch:
       test_setup: 
         $ref: "#/macros/test_setup/SetupStoreTokens"
       responses:
         '200':
-         admin_steps:
+          admin_steps:
             - Click *Try it out*.
             - Set the user_id parameter to the id of any other existing user (ideally, one you're not using for testing).
             - If the selected user has the USER role, set the "role" field of the request body to "ADMIN". If the selected user has the ADMIN role, set the "role" field of the request body to "USER". 
             - Execute. Response should return 200.
+        '400':
+          admin_steps:
+            - Click *Try it out*.
+            - Use a negative number as the item_id.
+            - Execute. Response should return 400.
+            - Set user_id to the id for an existing user.
+            - Remove all fields from the response body.
+            - Execute. Response should return 400.
         '403':
           $ref: "#/macros/responses/ForbiddenAdminOnly"
     delete:
       test_setup: 
-        $ref: "#/macros/test_setup/SetupStoreTokens"
+        - "For testing while logged in as a USER role, we're going to use a different account than usual,
+          since we don't want to delete that one. Get a JWT web token using the following credentials, 
+          and use it to authenticate in SwaggerUI when testing as a USER:
+          `{\"email\": \"user7@example.com\", \"password\": \"prod_secret_user\"}`"
+        - For testing while logged in as an ADMIN role, continue to use the JWT you've used thus far.
       responses:
+        '204': 
+          user_steps:
+            - Click *Try it out*.
+            - Ensure that the user_id parameter is set to 'me' (without quotes).
+            - Execute. Response should return 204.
+          admin_steps:
+            - Click *Try it out*.
+            - Ensure that the user_id parameter is set to the id of any other existing user (8 is recommended).
+            - Execute. Response should return 204.
         '403':
           $ref: "#/macros/responses/ForbiddenUserId"
       
@@ -347,20 +390,62 @@ paths:
     get:
       test_setup: []
       responses:
+        '200': 
+          user_steps:
+            - Click *Try it out*.
+            - Ensure that the user_id parameter is set to 'me' (without quotes).
+            - Execute. Response should return 200.
+          admin_steps:
+            - Click *Try it out*.
+            - Ensure that the user_id parameter is set to the id of any other existing user.
+            - Execute. Response should return 200.
         '403':
           $ref: "#/macros/responses/ForbiddenUserId"
   /users/{user_id}/list/public:
     get:
       test_setup: 
         $ref: "#/macros/test_setup/SetupStoreTokens"
+      responses:
+        '200':
+          no_auth_steps:
+            - Click *Try it out*.
+            - Ensure that the user_id parameter is set to the id of any existing user.
+            - Execute. Response should return 200.
+
   /auth/login:
     post:
       test_setup:
         - None
+      responses:  
+        '200':
+          no_auth_steps:
+            - Click *Try it out*.
+            - Set the "email" field to the email address of any existing user, and set the "password" field
+              to the corresponding password. (All users seeded with the ADMIN role have "prod_secret_admin"
+              set as their initial password. All users with the USER role have "prod_secred_user" set as their
+              initial password. Both passwords are without quotes.)
+            - Execute. Response should return 200.
+        '401':
+          no_auth_steps:
+            - Click *Try it out*.
+            - Set the "email" field to the email address not used by any existing user, and set the "password" field
+              to any string between 8 and 64 characters in length.
+            - Execute. Response should return 401.
+            - Set the "email" field to the email address of any existing user, and set the "password" field
+              to any string that is not the user's password (random gibberish such as "asdfghjkl" will work).
+            - Execute. Response should return 401.
+              
   /auth/signup:
     post:
       test_setup: 
         - None
+      responses:  
+        '201':
+          no_auth_steps:
+            - Click *Try it out*.
+            - Set the "email" field to the email address not used by any existing user, and set the "password" field
+              to any string between 8 and 64 characters in length.
+            - Execute. Response should return 201.
   /health:
     get:
       test_setup:
@@ -466,6 +551,12 @@ components:
     InvalidAuthInput:
       no_auth_steps: 
         - Click *Try it out*.
+        - Remove the @ symbol from the email address.
+        - Execute. Response should return 400.
+        - Restore the @ symbol to the email address.
+        - Shorten the password to be less than 8 characters.
+        - Execute. Response should return 400.
+        - Restore the password's length.
         - Remove either the "email" or "password" field of the request body.
         - Execute. Response should return 400.
     

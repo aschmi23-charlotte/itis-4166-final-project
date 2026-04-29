@@ -39,8 +39,7 @@ export default {
             .bail()
             .isEmail()
             .withMessage('Not a valid email address')
-            .normalizeEmail()
-            .bail(),
+            .normalizeEmail(),
 
         body('password')
             .exists({ values: 'falsy' })
@@ -54,7 +53,8 @@ export default {
             .isLength({ min: 8, max: 64 })
             .withMessage(
                 'Password must be at least 8 characters and at most 64 characters',
-            ),
+            )
+            .bail(),
 
         body('role')
             .optional()
@@ -92,6 +92,10 @@ export default {
             .escape()
             .isString()
             .withMessage('Password must be a string')
+            .isLength({ min: 8, max: 64 })
+            .withMessage(
+                'Password must be at least 8 characters and at most 64 characters',
+            )
             .bail(),
 
         handleValidationErrors,
@@ -139,6 +143,10 @@ export default {
             .escape()
             .isString()
             .withMessage('Password must be a string')
+            .isLength({ min: 8, max: 64 })
+            .withMessage(
+                'Password must be at least 8 characters and at most 64 characters',
+            )
             .bail(),
 
         handleValidationErrors,
