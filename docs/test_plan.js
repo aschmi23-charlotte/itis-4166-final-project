@@ -31,6 +31,13 @@ const resolved_yaml_path = "./docs/generated/openapi_resolved.yaml";
 const assemble_document_text = async (seed_data, test_list, ownership_table_user, ownership_table_admin) => `
 # ITIS-4166 Final Project - Alex Schmid
 
+This document was generated using a custom JavaScript file that combined information from my \`openapi.yaml\` specification
+with additional data from the database and other hand-written yaml files to ensure consistency and mitigate mistakes.
+
+The code and data involved was hand-written by me, and can be found in the project repo on github under the \`docs\` folder.
+
+No AI was used to create this document.
+
 ## Relevant Links
 
 * Repository: [https://github.com/aschmi23-charlotte/itis-4166-final-project](https://github.com/aschmi23-charlotte/itis-4166-final-project)
@@ -101,7 +108,8 @@ used for a certain set of steps. The three authentication states to consider are
 
 It is HIGHLY recommended that you acquire JWT keys for both the USER and ADMIN roles in advance, and store them somewhere easily accessible like a text file.
 This will be much more efficient than having to reacquire a new JWT from the  "/login" endpoint every time you need to switch accounts. To authenticate, simply
-paste the JWT into SwaggerUI's **Authorize** popup and click "Login". To disable authentication, open the popup again and click "Logout".
+paste the JWT into SwaggerUI's **Authorize** popup and click "Login". To disable authentication, open the popup again and click "Logout". For convienience, JWTs
+are set to expire after a full 24 hours.
 
 For USER role, use these credentials. You should be able to paste them directly into the request body of SwaggerUI's *Try it out* feature on the "/login" endpoint:
  \`{"email": "user1@example.com", "password": "prod_secret_user"}\`.
